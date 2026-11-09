@@ -40,7 +40,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);font-si
 h1{font:600 22px/1.15 var(--ui);letter-spacing:.01em;margin:0;text-wrap:balance}
 .sub{color:var(--muted);margin:6px 0 0}
 h2{font:600 11.5px var(--ui);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px}
-.read{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.read{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:0}
 .read div{background:var(--raise);padding:9px 11px;min-width:0}
 .read .wide{grid-column:1/-1}
 .read dt{font-size:11.5px;color:var(--muted);letter-spacing:.03em}
@@ -65,7 +65,6 @@ p{margin:0}
 .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:4px;padding:10px 12px;background:var(--raise)}
 .callout p+p{margin-top:6px}
 .muted{color:var(--muted)}
-code{font:12.5px var(--mono);color:var(--accent)}
 @media (max-width:860px){
   html,body{height:auto}
   .app{display:block;height:auto}
@@ -80,7 +79,7 @@ code{font:12.5px var(--mono);color:var(--accent)}
 
 <div class="app">
   <div class="stage" id="stage">
-    <canvas id="c" aria-label="3D model of the HUD optics in the goggles"></canvas>
+    <canvas id="c" aria-label="3D model of the HUD optics inside the goggles"></canvas>
     <div id="labels"></div>
     <div class="viewbar" role="group" aria-label="Camera">
       <button type="button" data-view="overview" aria-pressed="true">Overview</button>
@@ -95,26 +94,26 @@ code{font:12.5px var(--mono);color:var(--accent)}
   <aside class="panel">
     <header>
       <h1>Ski HUD optics bench</h1>
-      <p class="sub">The goggle HUD at real scale, in millimetres. OL39E panel → f30 doublet → 45° mirror → film combiner → right eye. Rays are traced live from the part dimensions.</p>
+      <p class="sub">The goggle HUD at real scale, in millimetres, built the REKKIE way: one small optics module clips inside the frame above your right eye, and nothing sits on top of the goggles. Panel → Ø12.7 f30 doublet → 15 mm mirror → film combiner → right eye. Rays are traced live from the part dimensions.</p>
     </header>
 
     <section aria-labelledby="h-read">
       <h2 id="h-read">What your eye gets</h2>
-      <dl class="read" style="margin:0">
+      <dl class="read">
         <div><dt>Image distance</dt><dd id="r-dist">–</dd></div>
         <div><dt>Image size</dt><dd id="r-size">–</dd></div>
         <div><dt>Position in view</dt><dd id="r-pos">–</dd></div>
         <div><dt>Picture visible</dt><dd id="r-vis">–</dd></div>
         <div class="wide"><dt>Eyebox</dt><dd id="r-eyebox">–</dd></div>
-        <div class="wide"><dt>Panel orientation in the pod</dt><dd id="r-orient">–</dd></div>
+        <div class="wide"><dt>Panel orientation in the module</dt><dd id="r-orient">–</dd></div>
       </dl>
     </section>
 
     <section aria-labelledby="h-adj">
       <h2 id="h-adj">Adjust</h2>
       <div class="ctl"><label for="s-focus">Focus: panel ↔ lens flat face</label><output id="o-focus"></output>
-        <input type="range" id="s-focus" min="19" max="23.5" step="0.05" value="22">
-        <span class="note">22.25 mm puts the image at infinity. Any further and it can't be focused.</span></div>
+        <input type="range" id="s-focus" min="24" max="28.5" step="0.05" value="27.25">
+        <span class="note">27.5 mm puts the image at infinity. Any further and it can't be focused.</span></div>
       <div class="ctl"><label for="s-up">HUD height above straight ahead</label><output id="o-up"></output>
         <input type="range" id="s-up" min="4" max="20" step="0.5" value="12"></div>
       <div class="ctl"><label for="s-right">HUD to the right</label><output id="o-right"></output>
@@ -135,7 +134,7 @@ code{font:12.5px var(--mono);color:var(--accent)}
       <h2 id="h-show">Show</h2>
       <div class="chips">
         <label class="chip"><input type="checkbox" id="t-rays" checked>Light rays</label>
-        <label class="chip"><input type="checkbox" id="t-xray" checked>See-through pod</label>
+        <label class="chip"><input type="checkbox" id="t-xray" checked>See-through housing</label>
         <label class="chip"><input type="checkbox" id="t-goggles" checked>Goggles</label>
         <label class="chip"><input type="checkbox" id="t-head" checked>Head</label>
         <label class="chip"><input type="checkbox" id="t-labels" checked>Labels</label>
@@ -151,26 +150,28 @@ code{font:12.5px var(--mono);color:var(--accent)}
     <section aria-labelledby="h-why">
       <h2 id="h-why">Why the hand-held test looked wrong</h2>
       <ol>
-        <li><strong>Small.</strong> Without a lens you can't bring a 10 mm panel close enough to look big and still focus. With the doublet it fills about 15.5° × 11.7°, like a 1 m wide screen 4 m away.</li>
-        <li><strong>Blurry.</strong> An eye can't focus at 2–3 cm. Put the panel 22 mm behind the doublet's flat face and the lens sends it out to a few metres.</li>
+        <li><strong>Small.</strong> Without a lens you can't bring a 10 mm panel close enough to look big and still focus. With an f30 doublet it fills about 15.5° × 11.7°, like a 1 m wide screen 4 m away.</li>
+        <li><strong>Blurry.</strong> An eye can't focus at 2–3 cm. Put the panel about 27 mm behind the doublet's flat face and the lens sends it out to a few metres.</li>
         <li><strong>Doubled.</strong> The goggle lens is two lenses with four surfaces, and each one reflected its own copy. A separate flat combiner fixes this: the film reflects much more than the plastic behind it, and light from the lens is parallel, so reflections from the combiner's two flat faces land in the same place.</li>
         <li><strong>Too close.</strong> Same cause as blurry: the picture sat 2 cm from your eye. After the lens it sits about 4 m away.</li>
       </ol>
       <div class="callout" style="margin-top:12px">
-        <p><strong>Change from HARDWARE.md:</strong> the film goes on its own small tilted piece of clear plastic, not on the goggle lens.</p>
-        <p class="muted">The goggle lens is curved around your head. Any patch of it can only reflect light from close to your own eye back into your eye, so there's nowhere to put the projector. A combiner tilted at about 45° solves that. It also keeps the HUD light out of the Cat 4 lens, which would let only 6.4 % through.</p>
+        <p><strong>Changes from HARDWARE.md</strong></p>
+        <p class="muted">The film goes on its own small tilted piece of clear plastic, not on the goggle lens. The goggle lens curves around your head, so any patch of it can only reflect light from close to your own eye back into your eye. A combiner tilted at about 45° solves that, and keeps the HUD light out of the Cat 4 lens, which would let only 6.4 % through.</p>
+        <p class="muted">Like REKKIE, the optics sit inside the frame. The space above your eye is only 20–25 mm deep, so the Ø25.4 mm doublet can't fit. It's swapped for a Ø12.7 mm f30 doublet. With the shorter light path inside the goggle, the small lens gives a bigger eyebox than the big lens did on top.</p>
       </div>
     </section>
 
     <section aria-labelledby="h-order">
       <h2 id="h-order">Build order</h2>
       <ol>
-        <li><strong>Bench check, no cutting.</strong> Run the HUD and hold the doublet with its flat face 22 mm from the panel. Look into the curved face from 5 cm. The text should be big and sharp, and should stay sharp when you glance past it at the far wall.</li>
-        <li><strong>Mock-up pod</strong> from foam board or card using the build sheet: doublet curved face down, mirror 11 mm above the flat face at 45°, panel facing the mirror.</li>
-        <li><strong>Combiner.</strong> Cut a 26 × 18 mm piece of 1 mm clear plastic (a CD case works) and stick the film on the side that faces your eye.</li>
-        <li><strong>Hold the mock-up over the goggles</strong> with the combiner in front of your right eye and check the eye view. Only then cut the slot in the frame top.</li>
-        <li><strong>Focus.</strong> Look at something far away and slide the panel away from the lens until the text starts to soften. Then come back about 0.3 mm. That puts the image at about 4 m.</li>
-        <li><strong>Final pod:</strong> 3D-print it from the same dimensions and glue it to the frame top.</li>
+        <li><strong>Order the small lens:</strong> a Ø12.7 mm, f = 30 mm achromatic doublet (Thorlabs AC127-030-A, or a clone sold as "12.7 mm achromatic lens f30").</li>
+        <li><strong>Bench check, no cutting.</strong> Run the HUD. Hold the doublet with its flat face about 27 mm from the panel and look into the curved face from 2–3 cm. The text should be big and sharp, and should stay sharp when you glance past it at the far wall.</li>
+        <li><strong>Cut the mirror</strong> to 15 × 15 mm with a glass cutter. Score the plain glass side, never the silvered side.</li>
+        <li><strong>Combiner.</strong> Cut a 16 × 16 mm piece of 1 mm clear plastic (a CD case works) and stick the film on the side that faces your eye.</li>
+        <li><strong>Card mock-up</strong> of the module using the build sheet: doublet curved face down, mirror 7.5 mm above its flat face at 45°, panel facing the mirror from the nose side. Hold it inside the goggles while wearing them and check where the HUD appears.</li>
+        <li><strong>Focus.</strong> Look at something far away and slide the panel away from the lens until the text starts to soften. Then come back about 0.25 mm. That puts the image at about 4 m.</li>
+        <li><strong>Final module:</strong> 3D-print it with a clip that follows the frame's top edge, like REKKIE's. The driver board sits against the inside of the frame between your eyes. The ESP32 and LiPo go in a pack on the strap, with a cable that runs under the frame foam.</li>
       </ol>
     </section>
 
@@ -179,14 +180,15 @@ code{font:12.5px var(--mono);color:var(--accent)}
       <table><tbody>
         <tr><th>OL39E panel</th><td class="v">active 8.13 × 6.15<br>glass 15.6 × 13.6</td></tr>
         <tr><th>OL39E driver board</th><td class="v">28 × 28</td></tr>
-        <tr><th>Achromatic doublet</th><td class="v">Ø25.4, f 30.0<br>14 thick, BFL 22.25</td></tr>
-        <tr><th>Front-surface mirror</th><td class="v">30 × 30 × 1.1</td></tr>
-        <tr><th>Combiner (film on clear plastic)</th><td class="v">26 × 18 × 1</td></tr>
+        <tr><th>Achromatic doublet (new)</th><td class="v">Ø12.7, f 30.0<br>5 thick, BFL 27.5</td></tr>
+        <tr><th>Front-surface mirror, cut down</th><td class="v">15 × 15 × 1.1</td></tr>
+        <tr><th>Combiner (film on clear plastic)</th><td class="v">16 × 16 × 1</td></tr>
         <tr><th>ESP32 Lite</th><td class="v">50 × 25.4</td></tr>
         <tr><th>LiPo 103450</th><td class="v">50 × 34 × 10</td></tr>
         <tr><th>COPOZZ lens (spherical)</th><td class="v">180 × 95, R ≈ 105</td></tr>
+        <tr><th>Ø25.4 f30 doublet</th><td class="v">not used:<br>too big for inside</td></tr>
       </tbody></table>
-      <p class="muted" style="margin-top:10px;font-size:12.5px">Doublet values come from the standard Ø25.4 / f30 prescription (Thorlabs AC254-030-A). Clones can differ by about 1 mm, and the focus slide takes that up. The goggle shell is approximated from the 180 × 95 mm spherical lens spec. Set your own eye-to-lens gap above.</p>
+      <p class="muted" style="margin-top:10px;font-size:12.5px">Doublet values come from Thorlabs' published AC127-030-A data. Clones can differ by about 1 mm, and the focus slide takes that up. The goggle shell is approximated from the 180 × 95 mm spherical lens spec, and the head is a rough stand-in. Set your own eye-to-lens gap above and check the mock-up on your face before printing.</p>
     </section>
   </aside>
 </div>
@@ -201,16 +203,21 @@ const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 const X = V3(1, 0, 0), Y = V3(0, 1, 0), Z = V3(0, 0, 1);
 
 // Units: millimetres. Origin: right eye's cornea. x = wearer's right, y = up, z = back (forward is -z).
-const OPT = { F: 30.03, BFL: 22.25, T: 14, R1: 20.9, R2: 16.7, R3: 79.8, t1: 12, DIA: 25.4, CLEAR_R: 12, R3_TO_M: 11 };
-const H_R3 = OPT.F - OPT.BFL;   // rear principal plane sits 7.78 mm inside the flat face
-const H_R1 = OPT.T - H_R3;      // 6.22 mm inside the curved face
+// Doublet: Thorlabs AC127-030-A prescription.
+const OPT = { F: 30.0, BFL: 27.5, R1: 17.86, R2: 13.53, R3: 44.17, t1: 3.5, t2: 1.5, DIA: 12.7, CLEAR_R: 5.9, FLAT_TO_M: 7.5, LENS_TO_COMB: 13 };
+const H_R3 = OPT.F - OPT.BFL;            // rear principal plane 2.5 mm inside the flat face
+const H_R1 = OPT.t1 + OPT.t2 - H_R3;     // 2.5 mm inside the curved face
+const MIRROR = 15;
 const PANEL = { w: 8.13, h: 6.15, gw: 15.6, gh: 13.6 };
-const COMB = { w: 26, h: 18, t: 1 };
+const COMB = { w: 16, h: 16, t: 1 };
 const GOG = { Rin: 105, Rout: 110.5, Rf: 108, A: 86, B: 44, yc: -3, depth: 26, gIn: 1, gOut: 8, gOuterLens: 7 };
+const BROW_Z = -1;                        // brow ridge, roughly level with the cornea
+const HEAD_U1 = 6.5, HEAD_U2 = 6.5, DEPTH = 8; // mirror head half-size (mirror 15 at 45° plus 1.2 mm walls); housing half-depth
+const BOARD = { c: V3(-36, 27, -16), s: 28 };
 const PUPIL = [[0, 0], [1.25, 0], [-1.25, 0], [0.62, 1.08], [-0.62, 1.08], [0.62, -1.08], [-0.62, -1.08]];
 const NU = 25, NV = 19;
 
-const P = { focus: 22, up: 12, right: 5, comb: 17, gap: 27, ex: 0, ey: 0 };
+const P = { focus: 27.25, up: 12, right: 5, comb: 17, gap: 27, ex: 0, ey: 0 };
 const SHOW = { rays: true, xray: true, goggles: true, head: true, labels: true, pattern: false };
 let view = "overview";
 
@@ -231,7 +238,6 @@ function outline(th, grow) {
   if (y < 0 && Math.abs(x) < w) { const k = Math.cos(Math.PI * x / (2 * w)); y = Math.max(y, -B + dep * k * k); }
   return [x, y];
 }
-// Point on a sphere of radius R (centred on S) above outline coords (Xc, Yc).
 function sph(Xc, Yc, R, S) {
   const y = Yc + GOG.yc, q = R * R - Xc * Xc - y * y;
   return V3(Xc - 32, y, S.z - Math.sqrt(Math.max(q, 0)));
@@ -250,36 +256,45 @@ function solve() {
   g.E0 = V3(0, 0, 0);
   g.E = V3(P.ex, P.ey, 0);
   g.S = V3(-32, 0, Math.sqrt(GOG.Rin ** 2 - 32 ** 2) - P.gap);
+  const lensZ = (x, y) => g.S.z - Math.sqrt(Math.max(GOG.Rin ** 2 - (x + 32) ** 2 - y * y, 0));
+  g.lensZ = lensZ;
   const el = P.up * D2R, az = P.right * D2R;
   g.C = V3(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)).multiplyScalar(P.comb);
 
-  // Frame band above the combiner: the beam has to pass through it.
-  let best = 1e9, th0 = Math.PI / 2;
-  for (let th = 0.3; th < Math.PI - 0.3; th += 0.002) {
-    const d = Math.abs(outline(th, GOG.gOut)[0] - 32 - g.C.x);
-    if (d < best) { best = d; th0 = th; }
-  }
-  const b = framePts(th0, g.S); g.band = b;
-  const yMid = (b.inF.y + b.inB.y + b.outF.y + b.outB.y) / 4;
-  const zMid = (b.inF.z + b.inB.z + b.outF.z + b.outB.z) / 4;
-  const flangeTop = Math.max(b.outF.y, b.inF.y);
-  const Ly = flangeTop + 1 + 2 + H_R1;                       // barrel bottom clears the frame by 1 mm
-  const k = (Ly - g.C.y) / (yMid - g.C.y);
-  g.L = V3(g.C.x + 0.5, Ly, g.C.z + (zMid - g.C.z) * k);     // lens centre (principal point)
-  g.cross = g.C.clone().lerp(g.L, (yMid - g.C.y) / (Ly - g.C.y));
-  g.frameTop = flangeTop;
-
-  const a = g.a = g.L.clone().sub(g.C).normalize();          // lens axis, pointing up to the display side
+  // Housing: a mirror head over the lens, and an arm toward the nose that holds the panel.
+  g.boxes = [
+    { min: [-HEAD_U1, -8, -DEPTH], max: [HEAD_U1, HEAD_U2, DEPTH] },
+    { min: [-(P.focus - OPT.FLAT_TO_M) - 2.5, -9, -DEPTH], max: [-HEAD_U1, 9, DEPTH] },
+  ];
+  // Lens axis runs from the combiner up to the mirror. Tilt it so the housing sits centred
+  // between the goggle lens (front) and the brow (back).
+  const rise = OPT.LENS_TO_COMB + H_R3 + OPT.FLAT_TO_M;
+  const yM = g.C.y + rise;
+  const housingFor = zM => {
+    const a = V3(0, yM - g.C.y, zM - g.C.z).normalize();
+    const M = g.C.clone().addScaledVector(a, rise);
+    const u2 = a, u3 = X.clone().cross(u2), corners = [];
+    for (const b of g.boxes) for (const i of [0, 1]) for (const j of [0, 1]) for (const k of [0, 1])
+      corners.push(M.clone().addScaledVector(X, [b.min[0], b.max[0]][i]).addScaledVector(u2, [b.min[1], b.max[1]][j]).addScaledVector(u3, [b.min[2], b.max[2]][k]));
+    return { a, corners, front: Math.min(...corners.map(p => GOG.Rin - p.distanceTo(g.S))), back: BROW_Z - Math.max(...corners.map(p => p.z)) };
+  };
+  let zM = (lensZ(g.C.x, yM) + BROW_Z) / 2;
+  for (let i = 0; i < 4; i++) { const h = housingFor(zM); zM += (h.back - h.front) / 2; }
+  const hz = housingFor(zM);
+  g.corners = hz.corners; g.modFront = hz.front; g.modBackGap = hz.back;
+  const a = g.a = hz.a;
+  g.L = g.C.clone().addScaledVector(a, OPT.LENS_TO_COMB);
+  g.R1v = g.L.clone().addScaledVector(a, -H_R1);
+  g.R3v = g.L.clone().addScaledVector(a, H_R3);
+  g.M = g.R3v.clone().addScaledVector(a, OPT.FLAT_TO_M);
+  g.nM = X.clone().add(a).negate().normalize();           // silvered face looks down and toward the nose
+  g.D = g.M.clone().addScaledVector(X, -(P.focus - OPT.FLAT_TO_M));
   g.u1 = X.clone();
   g.u2 = a.clone().addScaledVector(X, -a.dot(X)).normalize();
   g.u3 = g.u1.clone().cross(g.u2);
+  g.mV = g.nM.clone().cross(g.u3);
   g.lp1 = X.clone().addScaledVector(a, -a.dot(X)).normalize();
   g.lp2 = a.clone().cross(g.lp1);
-  g.R1v = g.L.clone().addScaledVector(a, -H_R1);
-  g.R3v = g.L.clone().addScaledVector(a, H_R3);
-  g.M = g.R3v.clone().addScaledVector(a, OPT.R3_TO_M);
-  g.nM = X.clone().sub(a).normalize();
-  g.D = g.M.clone().addScaledVector(X, P.focus - OPT.R3_TO_M);
   g.nC = g.E0.clone().sub(g.C).normalize().add(a).normalize();
   g.cU = X.clone().addScaledVector(g.nC, -X.dot(g.nC)).normalize();
   g.cV = g.nC.clone().cross(g.cU);
@@ -295,12 +310,11 @@ function solve() {
   g.fovV = 2 * Math.atan(PANEL.h / 2 / OPT.F) / D2R;
   g.blurPx = (3 / 1000) * Math.abs(g.Veye) / (g.fovH * D2R / 384);
 
-  // Where the eye sees a point q on the panel
   g.viewDirOf = q => {
     const qv = reflPt(q, g.M, g.nM);
     return reflDir(g.L.clone().sub(qv).normalize(), g.nC).negate();
   };
-  // Panel roll so the picture comes out upright
+  // Panel roll so the picture comes out upright. The panel faces +x (toward the mirror).
   const s0 = g.viewDirOf(g.D);
   const upV = Y.clone().addScaledVector(s0, -Y.dot(s0)).normalize();
   const rightV = s0.clone().cross(upV);
@@ -311,51 +325,54 @@ function solve() {
     if (sc > bs) { bs = sc; psi = i; }
   }
   g.e2 = Y.clone().multiplyScalar(Math.cos(psi * D2R)).addScaledVector(Z, Math.sin(psi * D2R));
-  g.e1 = X.clone().cross(g.e2);
+  g.e1 = g.e2.clone().cross(X);
   g.mirrored = g.viewDirOf(g.D.clone().addScaledVector(g.e1, 1)).sub(s0).dot(rightV) < 0;
   g.q = (u, v) => g.D.clone().addScaledVector(g.e1, (g.mirrored ? -u : u) * PANEL.w).addScaledVector(g.e2, v * PANEL.h);
-  g.s0 = s0;
 
-  // Can the eye at point e see along direction s? (reverse trace with apertures)
-  const lensTopY = b.inF.y - 1;
-  g.visible = (e, s) => {
+  // Can the eye at point e see panel point q? Reverse trace through combiner, lens and mirror.
+  const lensTopY = framePts(Math.PI / 2, g.S).inF.y - 1;
+  g.visible = (e, q) => {
+    const s = g.viewDirOf(q), qv = reflPt(q, g.M, g.nM);
     const hc = rayPlane(e, s, g.C, g.nC); if (!hc) return false;
     const rel = hc.clone().sub(g.C);
     if (Math.abs(rel.dot(g.cU)) > COMB.w / 2 || Math.abs(rel.dot(g.cV)) > COMB.h / 2) return false;
     const r = reflDir(s, g.nC);
     const hl = rayPlane(hc, r, g.L, a); if (!hl) return false;
     if (hl.distanceTo(g.L) > OPT.CLEAR_R) return false;
-    for (let i = 1; i < 12; i++) {
-      const p = hc.clone().lerp(hl, i / 12);
-      if (p.y < lensTopY && p.distanceTo(g.S) > GOG.Rin) return false;   // hits the goggle lens
+    const hm = rayPlane(hl, qv.clone().sub(hl).normalize(), g.M, g.nM); if (!hm) return false;
+    const rm = hm.clone().sub(g.M);
+    if (Math.abs(rm.dot(g.u3)) > MIRROR / 2 || Math.abs(rm.dot(g.mV)) > MIRROR / 2) return false;
+    for (let i = 1; i < 10; i++) {
+      const p = hc.clone().lerp(hl, i / 10);
+      if (p.y < lensTopY && p.distanceTo(g.S) > GOG.Rin) return false;
     }
     return true;
   };
   g.grid = []; let sum = 0;
   for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
-    const s = g.viewDirOf(g.q(i / (NU - 1) - 0.5, j / (NV - 1) - 0.5));
-    let n = 0; for (const [px, py] of PUPIL) if (g.visible(V3(g.E.x + px, g.E.y + py, 0), s)) n++;
+    const q = g.q(i / (NU - 1) - 0.5, j / (NV - 1) - 0.5);
+    let n = 0; for (const [px, py] of PUPIL) if (g.visible(V3(g.E.x + px, g.E.y + py, 0), q)) n++;
     const f = n / PUPIL.length; g.grid.push(f); sum += f;
   }
   g.visFrac = sum / (NU * NV);
   // Eyebox for the HUD content: everything inside the firmware's 24 px margin
   const bu = 0.5 - 24 / 384, bv = 0.5 - 24 / 288;
-  const border = [[-bu, -bv], [bu, -bv], [-bu, bv], [bu, bv], [0, -bv], [0, bv], [-bu, 0], [bu, 0]]
-    .map(([u, v]) => g.viewDirOf(g.q(u, v)));
-  const ok = e => border.every(s => g.visible(e, s));
+  const border = [[-bu, -bv], [bu, -bv], [-bu, bv], [bu, bv], [0, -bv], [0, bv], [-bu, 0], [bu, 0]].map(([u, v]) => g.q(u, v));
+  const ok = e => border.every(q => g.visible(e, q));
   const reach = (dx, dy) => { let r = -1; for (let t = 0; t <= 8.001; t += 0.25) { if (ok(V3(dx * t, dy * t, 0))) r = t; else break; } return r; };
   g.ebX = Math.min(reach(1, 0), reach(-1, 0));
   g.ebY = Math.min(reach(0, 1), reach(0, -1));
 
-  // Clearances and angles for the build sheet
+  // Module housing extents in the mirror frame (u1 = toward right temple, u2 = up the lens axis, u3 = toward face)
+  g.modSize = [(P.focus - OPT.FLAT_TO_M) + 2.5 + HEAD_U1, 9 + 8 + OPT.FLAT_TO_M + H_R3 + H_R1 + 1, 2 * DEPTH];
+
   g.cTop = g.C.clone().addScaledVector(g.cV, COMB.h / 2);
   g.cBot = g.C.clone().addScaledVector(g.cV, -COMB.h / 2);
   g.lashGap = -g.cBot.z;
   g.topGap = GOG.Rin - g.cTop.distanceTo(g.S);
   g.combTilt = Math.asin(Math.abs(g.nC.y)) / D2R;
   g.mirrorAngle = Math.asin(Math.abs(g.nM.dot(a))) / D2R;
-  g.podTop = g.M.clone().addScaledVector(g.u2, 16).y;
-  g.psi = psi;
+  g.s0 = s0;
   return g;
 }
 
@@ -376,16 +393,18 @@ const fill = new THREE.DirectionalLight(0xbfd6ff, 0.35); fill.position.set(-300,
 
 const MAT = {
   housing: new THREE.MeshStandardMaterial({ color: 0xd5d9dc, roughness: 0.8, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }),
-  crown: new THREE.MeshStandardMaterial({ color: 0xbfe3ff, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false }),
-  flint: new THREE.MeshStandardMaterial({ color: 0x8cb4ec, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false }),
+  clip: new THREE.MeshStandardMaterial({ color: 0x8a8f94, roughness: 0.9, side: THREE.DoubleSide, transparent: true, opacity: 1 }),
+  crown: new THREE.MeshStandardMaterial({ color: 0xbfe3ff, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthWrite: false }),
+  flint: new THREE.MeshStandardMaterial({ color: 0x8cb4ec, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false }),
   mirror: new THREE.MeshStandardMaterial({ color: 0xf4f7fa, roughness: 0.06, metalness: 1 }),
   panelGlass: new THREE.MeshStandardMaterial({ color: 0x0a0c0e, roughness: 0.25 }),
   pcb: new THREE.MeshStandardMaterial({ color: 0x1f6a3a, roughness: 0.6 }),
   chip: new THREE.MeshStandardMaterial({ color: 0x15181b, roughness: 0.5 }),
+  flex: new THREE.MeshStandardMaterial({ color: 0xc98a2b, roughness: 0.6 }),
   combiner: new THREE.MeshStandardMaterial({ color: 0xcfefff, roughness: 0.08, metalness: 0.2, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false }),
-  plate: new THREE.MeshStandardMaterial({ color: 0x2b3036, roughness: 0.7 }),
+  plate: new THREE.MeshStandardMaterial({ color: 0x5a5f65, roughness: 0.8 }),
   frame: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, side: THREE.DoubleSide, transparent: true, opacity: 1 }),
-  outerLens: new THREE.MeshStandardMaterial({ color: 0x7a4214, metalness: 0.25, roughness: 0.45, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false }),
+  outerLens: new THREE.MeshStandardMaterial({ color: 0x7a4214, metalness: 0.25, roughness: 0.45, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false }),
   innerLens: new THREE.MeshStandardMaterial({ color: 0xdfe9ef, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false }),
   head: new THREE.MeshStandardMaterial({ color: 0xc8b6a6, roughness: 0.9, transparent: true, opacity: 0.16, depthWrite: false }),
   eye: new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.4 }),
@@ -405,6 +424,7 @@ const povCanvas = document.createElement("canvas"); povCanvas.width = 384; povCa
 const panelTex = new THREE.CanvasTexture(hudCanvas);
 const povTex = new THREE.CanvasTexture(povCanvas);
 const GREEN = "#5dff8f";
+let G = null;
 function drawHud() {
   const c = hudCanvas.getContext("2d");
   c.fillStyle = "#000"; c.fillRect(0, 0, 384, 288);
@@ -421,10 +441,8 @@ function drawHud() {
     c.font = "700 112px Montserrat, sans-serif"; c.fillText("42", 192, 112);
     c.font = "700 24px Montserrat, sans-serif"; c.fillText("km/h", 192, 174);
     c.font = "700 40px Montserrat, sans-serif"; c.textAlign = "left";
-    // mountain icon + altitude, bottom left
     c.beginPath(); c.moveTo(24, 256); c.lineTo(38, 226); c.lineTo(46, 240); c.lineTo(52, 232); c.lineTo(64, 256); c.closePath(); c.fill();
     c.fillText("1850", 74, 242);
-    // arrow icon + vertical drop, bottom right
     c.textAlign = "right"; c.fillText("320", 360, 242);
     const w = c.measureText("320").width, ax = 360 - w - 26;
     c.fillRect(ax - 4, 224, 8, 18); c.beginPath(); c.moveTo(ax - 13, 240); c.lineTo(ax + 13, 240); c.lineTo(ax, 258); c.closePath(); c.fill();
@@ -449,11 +467,6 @@ function place(mesh, origin, bx, by, bz) {
   mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(bx, by, bz));
   mesh.position.copy(origin); return mesh;
 }
-function podBox(g, min, max, mat) {
-  const s = [0, 1, 2].map(i => max[i] - min[i]), c = [0, 1, 2].map(i => (max[i] + min[i]) / 2);
-  const o = g.M.clone().addScaledVector(g.u1, c[0]).addScaledVector(g.u2, c[1]).addScaledVector(g.u3, c[2]);
-  return place(new THREE.Mesh(new THREE.BoxGeometry(s[0], s[1], s[2]), mat), o, g.u1, g.u2, g.u3);
-}
 function hull(pts) {
   pts = pts.slice().sort((p, q) => p[0] - q[0] || p[1] - q[1]);
   const cr = (o, p, q) => (p[0] - o[0]) * (q[1] - o[1]) - (p[1] - o[1]) * (q[0] - o[0]);
@@ -461,6 +474,12 @@ function hull(pts) {
   for (const p of pts) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
   for (const p of pts.slice().reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
   lo.pop(); up.pop(); return lo.concat(up);
+}
+function beam(p, q, w, h, mat) {   // box from p to q
+  const dir = q.clone().sub(p), len = dir.length(); dir.normalize();
+  const side = Math.abs(dir.dot(X)) < 0.9 ? X.clone() : Y.clone();
+  const bx = side.addScaledVector(dir, -side.dot(dir)).normalize(), bz = bx.clone().cross(dir);
+  return place(new THREE.Mesh(new THREE.BoxGeometry(w, len, h), mat), p.clone().add(q).multiplyScalar(0.5), bx, dir, bz);
 }
 
 function buildShell(g, R, grow, mat) {
@@ -479,23 +498,13 @@ function buildShell(g, R, grow, mat) {
   const m = new THREE.Mesh(geo, mat); m.renderOrder = 2; return m;
 }
 
-function slotTest(g, p) {
-  const r = p.clone().sub(g.cross);
-  if (Math.abs(r.dot(g.u2)) > 30) return 0;
-  const a = Math.abs(r.dot(g.u1)), b = Math.abs(r.dot(g.u3));
-  if (a < 16 && b < 8) return 2;
-  if (a < 17.5 && b < 9.5) return 1;
-  return 0;
-}
 function buildFrame(g) {
-  const N = 480, T = [0, 4, 8, 12, 16, 21, 26], ring = [];
+  const N = 480, T = [0, 8, 16, 21, 26], ring = [];
   for (let i = 0; i <= N; i++) ring.push(framePts(i / N * Math.PI * 2, g.S));
   const pos = [], col = [];
-  const cT = new THREE.Color(0x1c2026), cF = new THREE.Color(0x4b5058), cC = new THREE.Color(0xe9a23b);
+  const cT = new THREE.Color(0x1c2026), cF = new THREE.Color(0x4b5058);
   const quad = (p0, p1, p2, p3, foam) => {
-    const ctr = p0.clone().add(p1).add(p2).add(p3).multiplyScalar(0.25);
-    const s = slotTest(g, ctr); if (s === 2) return;
-    const cc = s === 1 ? cC : (foam ? cF : cT);
+    const cc = foam ? cF : cT;
     for (const p of [p0, p1, p2, p0, p2, p3]) { pos.push(p.x, p.y, p.z); col.push(cc.r, cc.g, cc.b); }
   };
   const at = (r, w, t) => r[w + "F"].clone().addScaledVector(r[w === "in" ? "dIn" : "dOut"], t);
@@ -519,64 +528,94 @@ function buildFrame(g) {
 function lensProfile(fn, r0, r1, steps) { const pts = []; for (let i = 0; i <= steps; i++) { const r = r0 + (r1 - r0) * i / steps; pts.push(new THREE.Vector2(r, fn(r))); } return pts; }
 function buildLens(g) {
   const grp = new THREE.Group(), RR = OPT.DIA / 2;
-  const h1 = r => -H_R1 + (OPT.R1 - Math.sqrt(OPT.R1 ** 2 - r * r));
-  const h2 = r => -H_R1 + OPT.t1 - (OPT.R2 - Math.sqrt(OPT.R2 ** 2 - r * r));
-  const h3 = r => H_R3 - (OPT.R3 - Math.sqrt(OPT.R3 ** 2 - r * r));
-  const crown = lensProfile(h1, 0, RR, 24).concat(lensProfile(h2, RR, 0, 24));
-  const flint = lensProfile(h2, 0, RR, 24).concat(lensProfile(h3, RR, 0, 24));
-  const basisZ = g.lp1.clone().cross(g.a);
+  const sag = (R, r) => R - Math.sqrt(R * R - r * r);
+  const h1 = r => -H_R1 + sag(OPT.R1, r);
+  const h2 = r => -H_R1 + OPT.t1 - sag(OPT.R2, r);
+  const h3 = r => H_R3 - sag(OPT.R3, r);
+  const crown = lensProfile(h1, 0, RR, 20).concat(lensProfile(h2, RR, 0, 20));
+  const flint = lensProfile(h2, 0, RR, 20).concat(lensProfile(h3, RR, 0, 20));
+  const bz = g.lp1.clone().cross(g.a);
   for (const [pts, mat] of [[crown, MAT.crown], [flint, MAT.flint]]) {
     const m = new THREE.Mesh(new THREE.LatheGeometry(pts, 64), mat); m.renderOrder = 3;
-    grp.add(place(m, g.L, g.lp1, g.a, basisZ));
+    grp.add(place(m, g.L, g.lp1, g.a, bz));
   }
-  // barrel
-  const len = H_R1 + 2 + H_R3 + OPT.R3_TO_M - 15;
-  const bar = new THREE.Mesh(new THREE.CylinderGeometry(15.5, 15.5, len, 48, 1, true), MAT.housing);
-  const mid = g.R1v.clone().addScaledVector(g.a, -2 + len / 2);
-  grp.add(place(bar, mid, g.lp1, g.a, basisZ));
+  const len = H_R1 + 1 + 2;   // ring from 1 mm below the curved face up to the housing
+  const bar = new THREE.Mesh(new THREE.CylinderGeometry(8.5, 8.5, len, 40, 1, true), MAT.housing);
+  grp.add(place(bar, g.L.clone().addScaledVector(g.a, (2 - H_R1 - 1) / 2), g.lp1, g.a, bz));
   return grp;
 }
 
-function buildPod(g) {
+function buildModule(g) {
   const grp = new THREE.Group();
-  const panelU = P.focus - OPT.R3_TO_M;
-  grp.add(podBox(g, [-17, -16, -17], [panelU + 10, 16, 17], MAT.housing));
-  // mirror, silvered face at M
-  const m2 = g.nM.clone().cross(g.u3);
-  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(30, 30, 1.1), MAT.mirror), g.M.clone().addScaledVector(g.nM, -0.55), g.u3, m2, g.nM));
-  // panel glass + active area showing the picture
-  const nOut = X.clone().negate();
-  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(PANEL.gw, PANEL.gh, 1), MAT.panelGlass), g.D.clone().addScaledVector(X, 0.5), g.e1, g.e2, nOut));
+  for (const b of g.boxes) {
+    const s = [0, 1, 2].map(i => b.max[i] - b.min[i]), c = [0, 1, 2].map(i => (b.max[i] + b.min[i]) / 2);
+    const o = g.M.clone().addScaledVector(g.u1, c[0]).addScaledVector(g.u2, c[1]).addScaledVector(g.u3, c[2]);
+    grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(s[0], s[1], s[2]), MAT.housing), o, g.u1, g.u2, g.u3));
+  }
+  const b = { min: [g.boxes[1].min[0], -8], max: [HEAD_U1, 9] };
+  // mirror
+  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(MIRROR, MIRROR, 1.1), MAT.mirror), g.M.clone().addScaledVector(g.nM, -0.55), g.u3, g.mV, g.nM));
+  // panel: glass, and the active area showing the picture, facing +x toward the mirror
+  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(PANEL.gw, PANEL.gh, 1), MAT.panelGlass), g.D.clone().addScaledVector(X, -0.5), g.e1, g.e2, X));
   const act = new THREE.Mesh(new THREE.PlaneGeometry(PANEL.w, PANEL.h), new THREE.MeshBasicMaterial({ map: panelTex }));
   if (g.mirrored) act.scale.x = -1;
-  grp.add(place(act, g.D.clone().addScaledVector(X, -0.03), g.e1, g.e2, nOut));
-  // driver board and parts
-  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(28, 28, 1.6), MAT.pcb), g.D.clone().addScaledVector(X, 4.8), g.e1, g.e2, nOut));
-  for (const [u, v, w, h, t] of [[-5, 4, 10, 10, 1.2], [7, -6, 6, 4, 1.5], [-8, -8, 5, 3, 2], [8, 8, 4, 4, 1]])
-    grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(w, h, t), MAT.chip),
-      g.D.clone().addScaledVector(X, 5.6 + t / 2).addScaledVector(g.e1, u).addScaledVector(g.e2, v), g.e1, g.e2, nOut));
-  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(9, 0.2, 4), MAT.chip), g.D.clone().addScaledVector(X, 2.6).addScaledVector(g.e2, -6.6), g.e1, g.e2, nOut));
-  // combiner: film side faces the eye
+  grp.add(place(act, g.D.clone().addScaledVector(X, 0.03), g.e1, g.e2, X));
+  // combiner, film side toward the eye
   const comb = new THREE.Mesh(new THREE.BoxGeometry(COMB.w, COMB.h, COMB.t), MAT.combiner); comb.renderOrder = 4;
   grp.add(place(comb, g.C.clone().addScaledVector(g.nC, -COMB.t / 2), g.cU, g.cV, g.nC));
-  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(COMB.w, COMB.h, COMB.t)), MAT.edge);
-  grp.add(place(edges, g.C.clone().addScaledVector(g.nC, -COMB.t / 2), g.cU, g.cV, g.nC));
-  // side plates carrying the combiner down through the slot
+  grp.add(place(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(COMB.w, COMB.h, COMB.t)), MAT.edge), g.C.clone().addScaledVector(g.nC, -COMB.t / 2), g.cU, g.cV, g.nC));
+  // two side arms hugging the lens ring, down to the combiner
   const al = p => p.clone().sub(g.C).dot(g.u2), be = p => p.clone().sub(g.C).dot(g.u3);
-  const top = al(g.R1v) - 1;
+  const top = al(g.M) + b.min[1] + 1;
   const pts = hull([[top, -6], [top, 6], [al(g.cTop), be(g.cTop) - 2], [al(g.cTop), be(g.cTop) + 2], [al(g.cBot), be(g.cBot) - 2], [al(g.cBot), be(g.cBot) + 2]]);
   const shape = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1])));
-  for (const xo of [COMB.w / 2 + 0.5, -COMB.w / 2 - 2]) {
+  for (const xo of [COMB.w / 2 + 0.3, -COMB.w / 2 - 1.8]) {
     const pl = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 1.5, bevelEnabled: false }), MAT.plate);
     grp.add(place(pl, g.C.clone().addScaledVector(g.u1, xo), g.u2, g.u3, g.u1));
   }
+  // REKKIE-style clip: a strip hugging the frame's inner top edge, and two posts down to the housing
+  const xs = [g.M.x + b.min[0] - 12, g.M.x + b.max[0] + 6];
+  const strip = [], sidx = [];
+  let n = 0;
+  for (let th = Math.PI * 0.2; th < Math.PI * 0.8; th += 0.004) {
+    const f = framePts(th, g.S); if (f.inF.x < xs[0] || f.inF.x > xs[1]) continue;
+    for (const t of [3, 15]) { const p = f.inF.clone().addScaledVector(f.dIn, t); p.y -= 1.2; strip.push(p.x, p.y, p.z); }
+    if (n > 0) { const k = 2 * n; sidx.push(k - 2, k - 1, k + 1, k - 2, k + 1, k); }
+    n++;
+  }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.Float32BufferAttribute(strip, 3)); sg.setIndex(sidx); sg.computeVertexNormals();
+  grp.add(new THREE.Mesh(sg, MAT.clip));
+  const roofAt = x => {
+    let best = null, bd = 1e9;
+    for (let th = Math.PI * 0.2; th < Math.PI * 0.8; th += 0.004) {
+      const f = framePts(th, g.S); if (Math.abs(f.inF.x - x) > 2) continue;
+      for (let t = 3; t <= 15; t += 0.5) { const p = f.inF.clone().addScaledVector(f.dIn, t); const d = Math.abs(p.z - g.M.z); if (d < bd) { bd = d; best = p; } }
+    }
+    return best;
+  };
+  for (const [du, top2] of [[b.min[0] + 4, 9], [b.max[0] - 3, HEAD_U2]]) {
+    const foot = g.M.clone().addScaledVector(g.u1, du).addScaledVector(g.u2, top2);
+    const roof = roofAt(foot.x); if (!roof) continue; roof.y -= 1.2;
+    if (roof.y > foot.y + 1) grp.add(beam(foot, roof, 4, 6, MAT.clip));
+  }
+  g.roofGap = (() => { const r = roofAt(g.M.x); return r ? r.y - 1.2 - (g.M.clone().addScaledVector(g.u2, HEAD_U2).y) : 0; })();
+  // driver board between the eyes, against the inside of the frame, joined to the panel by its flex
+  const bc = BOARD.c;
+  grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(BOARD.s, BOARD.s, 1.6), MAT.pcb), bc, X, Y, Z));
+  for (const [u, v, w, h, t] of [[-5, 4, 10, 10, 1.2], [7, -6, 6, 4, 1.5], [-8, -8, 5, 3, 2], [8, 8, 4, 4, 1]])
+    grp.add(place(new THREE.Mesh(new THREE.BoxGeometry(w, h, t), MAT.chip), bc.clone().add(V3(u, v, -0.8 - t / 2)), X, Y, Z));
+  const fs = g.D.clone().addScaledVector(X, -1.5).addScaledVector(g.e2, -PANEL.gh / 2);
+  const fe = bc.clone().add(V3(BOARD.s / 2 - 3, 0, -1));
+  const flexCurve = new THREE.CatmullRomCurve3([fs, fs.clone().add(V3(-3, -2, 0)), fe.clone().add(V3(3, 0, -2)), fe]);
+  g.flexLen = flexCurve.getLength();
+  grp.add(new THREE.Mesh(new THREE.TubeGeometry(flexCurve, 30, 1.2, 4, false), MAT.flex));
   return grp;
 }
 
 function buildRays(g) {
   const pos = [], col = [];
   const fields = [[-0.5, 0, 0x45c8ff], [0, 0, 0x5dff8f], [0.5, 0, 0xe9a23b]];
-  const offs = []; for (const d of [-10, -5, 5, 10]) { offs.push([d, 0], [0, d]); } offs.push([0, 0]);
+  const offs = [[0, 0]]; for (const dd of [-5, -2.5, 2.5, 5]) offs.push([dd, 0], [0, dd]);
   const seg = (p, q, c, k) => { pos.push(p.x, p.y, p.z, q.x, q.y, q.z); col.push(c.r * k, c.g * k, c.b * k, c.r * k, c.g * k, c.b * k); };
   for (const [fu, fv, hex] of fields) {
     const c = new THREE.Color(hex), q = g.q(fu, fv), qv = reflPt(q, g.M, g.nM);
@@ -589,14 +628,13 @@ function buildRays(g) {
       seg(q, Xm, c, 0.45); seg(Xm, Pp, c, 0.6);
       const dir = !Q ? g.L.clone().sub(qv).normalize() : (si > 0 ? Pp.clone().sub(Q) : Q.clone().sub(Pp)).normalize();
       const hc = rayPlane(Pp, dir, g.C, g.nC);
-      if (!hc) { seg(Pp, Pp.clone().addScaledVector(dir, 60), c, 0.3); continue; }
+      if (!hc) { seg(Pp, Pp.clone().addScaledVector(dir, 30), c, 0.3); continue; }
       const rel = hc.clone().sub(g.C);
       const inside = Math.abs(rel.dot(g.cU)) <= COMB.w / 2 && Math.abs(rel.dot(g.cV)) <= COMB.h / 2;
       seg(Pp, hc, c, inside ? 0.9 : 0.3);
       if (!inside) continue;
       const r = reflDir(dir, g.nC);
-      const t = (3 - hc.z) / r.z;
-      seg(hc, hc.clone().addScaledVector(r, t), c, 1);
+      seg(hc, hc.clone().addScaledVector(r, (3 - hc.z) / r.z), c, 1);
     }
   }
   const geo = new THREE.BufferGeometry();
@@ -637,21 +675,26 @@ function buildStrapPack(g) {
   for (let i = 0; i < NS; i++) { const a = 2 * i; idx.push(a, a + 1, a + 3, a, a + 3, a + 2); }
   const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
   grp.add(new THREE.Mesh(geo, MAT.strap));
-  // electronics pack on the right strap
   const pc = V3(69, -3, 100);
   const pack = new THREE.Mesh(new THREE.BoxGeometry(16, 40, 62), MAT.pack); pack.position.copy(pc); pack.renderOrder = 5; grp.add(pack);
   const esp = new THREE.Mesh(new THREE.BoxGeometry(1.6, 25.4, 50), MAT.esp); esp.position.set(75, -3, 100); grp.add(esp);
   const bat = new THREE.Mesh(new THREE.BoxGeometry(10, 34, 50), MAT.batt); bat.position.set(66.5, -3, 100); grp.add(bat);
-  const start = g.M.clone().addScaledVector(g.u1, P.focus - OPT.R3_TO_M + 9).addScaledVector(g.u2, -10);
-  const cab = new THREE.CatmullRomCurve3([start, V3(start.x + 10, start.y - 12, start.z + 18), V3(74, 30, 40), V3(72, 17.5, 82)]);
-  grp.add(new THREE.Mesh(new THREE.TubeGeometry(cab, 60, 1.8, 8, false), MAT.cable));
+  // cable: driver board → along the inside of the frame top → out under the foam at the right temple → pack
+  const bc = BOARD.c, topR = framePts(Math.PI * 0.32, g.S);
+  const cab = new THREE.CatmullRomCurve3([
+    bc.clone().add(V3(0, BOARD.s / 2, 0)), V3(-20, 39, -12), V3(10, 38, -9),
+    topR.inF.clone().addScaledVector(topR.dIn, 20).add(V3(0, -3, 0)), V3(62, 18, 40), V3(70, 17.5, 82)]);
+  grp.add(new THREE.Mesh(new THREE.TubeGeometry(cab, 80, 1.6, 8, false), MAT.cable));
   grp.userData.pack = pc;
   return grp;
 }
 
 const head = new THREE.Group();
 {
-  const hm = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), MAT.head); hm.scale.set(75, 120, 100); hm.position.set(-32, -10, 95); hm.renderOrder = 1; head.add(hm);
+  const add = (sx, sy, sz, x, y, z) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 24), MAT.head); m.scale.set(sx, sy, sz); m.position.set(x, y, z); m.renderOrder = 1; head.add(m); };
+  add(75, 120, 100, -32, -10, 95);   // skull
+  add(70, 9, 13, -32, 22, 12);       // brow ridge, front at about z = -1
+  add(9, 28, 16, -32, -15, -8);      // nose
   for (const x of [0, -64]) {
     const e = new THREE.Mesh(new THREE.SphereGeometry(12, 32, 20), MAT.eye); e.position.set(x, 0, 12); head.add(e);
     const ir = new THREE.Mesh(new THREE.SphereGeometry(5.6, 24, 12), MAT.iris); ir.scale.z = 0.25; ir.position.set(x, 0, 0.9); head.add(ir);
@@ -659,7 +702,6 @@ const head = new THREE.Group();
 }
 scene.add(head);
 
-// Snowy slope for the eye view (metres-scale, in mm)
 function buildWorld() {
   const w = new THREE.Group();
   const sg = new THREE.SphereGeometry(1.2e6, 32, 16), sc = [], sp = sg.attributes.position;
@@ -693,7 +735,7 @@ function buildWorld() {
 const world = buildWorld(); scene.add(world);
 
 // ---------------------------------------------------------------- rebuild + readouts
-let G = null, rig = null, hudMesh = null, rays = null, goggles = null, labelAnchors = [];
+let rig = null, hudMesh = null, rays = null, goggles = null, labelAnchors = [];
 function disposeTree(o) { o.traverse(n => { if (n.geometry) n.geometry.dispose(); if (n.material && !Object.values(MAT).includes(n.material)) n.material.dispose(); }); }
 function rebuild() {
   G = solve();
@@ -705,19 +747,20 @@ function rebuild() {
   goggles.add(buildShell(G, GOG.Rout, GOG.gOuterLens, MAT.outerLens));
   const sp = buildStrapPack(G); goggles.add(sp);
   rig.add(goggles);
-  rig.add(buildPod(G));
+  rig.add(buildModule(G));
   rig.add(buildLens(G));
   rays = buildRays(G); rig.add(rays);
   scene.add(rig);
   hudMesh = buildHud(G); scene.add(hudMesh);
   labelAnchors = [
-    ["Panel + driver", G.D.clone().addScaledVector(X, 6).addScaledVector(G.u2, 14)],
-    ["Doublet f30", G.L.clone().addScaledVector(G.u3, -16)],
-    ["Mirror 45°", G.M.clone().addScaledVector(G.u2, 16).addScaledVector(G.u1, -6)],
-    ["Combiner", G.C.clone().addScaledVector(X, -COMB.w / 2 - 2)],
-    ["Slot in frame", G.cross.clone().addScaledVector(X, -17)],
+    ["Panel", G.D.clone().add(V3(0, 9, 0))],
+    ["Doublet Ø12.7 f30", G.L.clone().addScaledVector(X, 10)],
+    ["Mirror 15×15", G.M.clone().addScaledVector(G.u2, 10).addScaledVector(X, 4)],
+    ["Combiner", G.C.clone().addScaledVector(X, COMB.w / 2 + 3)],
+    ["Frame clip", G.M.clone().add(V3(-10, 16, 0))],
+    ["Driver board", BOARD.c.clone().add(V3(-14, 0, -2))],
     ["ESP32 + LiPo", sp.userData.pack.clone().add(V3(8, 20, 0))],
-    ["Right eye", V3(0, -12, 0)],
+    ["Right eye", V3(4, -12, 0)],
   ];
   applyVisibility();
   paintPov(true);
@@ -737,31 +780,34 @@ function dirWords(v) {
 }
 function readout(g) {
   const dist = g.beyond ? `<span class="bad">past infinity</span><small>Panel too far from the lens. The eye can't focus this.</small>`
-    : !isFinite(g.imgDist) ? "∞" : g.imgDist >= 1000 ? `${fmt(g.imgDist / 1000)} m` : `<span class="bad">${fmt(g.imgDist / 10, 0)} cm</span><small>Too close for comfort. Move the panel toward 22.25.</small>`;
+    : !isFinite(g.imgDist) ? "∞" : g.imgDist >= 1000 ? `${fmt(g.imgDist / 1000)} m` : `<span class="bad">${fmt(g.imgDist / 10, 0)} cm</span><small>Too close for comfort. Move the panel toward 27.5.</small>`;
   $("r-dist").innerHTML = dist;
   const dRef = isFinite(g.imgDist) && !g.beyond ? g.imgDist : 4000;
   $("r-size").innerHTML = `${fmt(g.fovH)}° × ${fmt(g.fovV)}°<small>${fmt(2 * dRef / 1000 * Math.tan(g.fovH / 2 * D2R), 2)} m wide at ${fmt(dRef / 1000)} m</small>`;
   $("r-pos").innerHTML = `${fmt(P.up, 1)}° up · ${fmt(Math.abs(P.right), 1)}° ${P.right >= 0 ? "right" : "left"}`;
   const vp = Math.round(g.visFrac * 100);
   $("r-vis").innerHTML = `<span class="${vp >= 97 ? "ok" : vp >= 80 ? "" : "bad"}">${vp} %</span><small>at the current eye position</small>`;
-  const eb = (v) => v < 0 ? `<span class="bad">edges cut</span>` : `±${fmt(v, 2)} mm`;
+  const eb = v => v < 0 ? `<span class="bad">edges cut</span>` : `±${fmt(v, 2)} mm`;
   $("r-eyebox").innerHTML = `${eb(g.ebX)} sideways · ${eb(g.ebY)} up/down<small>How far your eye can move with all HUD content (inside the 24 px margin) still visible. Past this the edges fade first.</small>`;
-  $("r-orient").innerHTML = `Picture top points ${dirWords(g.e2)}<small>Panel faces the mirror (toward your nose). Driver mirror setting: ${g.mirrored ? "<strong>on</strong> (long-press Brightness+)" : "off, two reflections cancel"}.</small>`;
+  $("r-orient").innerHTML = `Picture top points ${dirWords(g.e2)}<small>The panel faces the mirror from the nose side. Driver mirror setting: ${g.mirrored ? "<strong>on</strong> (long-press Brightness+)" : "off, two reflections cancel"}.</small>`;
   const warn = (ok, s) => ok ? s : `<span class="bad">${s}</span>`;
   const rows = [
     ["Panel surface → lens flat face", `${fmt(P.focus, 2)} mm`],
-    ["Lens", "Ø25.4 × 14, curved face down"],
-    ["Lens flat face → mirror centre", `${OPT.R3_TO_M} mm`],
-    ["Mirror angle to lens axis", `${fmt(g.mirrorAngle)}°`],
-    ["Mirror centre → panel surface", `${fmt(P.focus - OPT.R3_TO_M, 2)} mm`],
-    ["Lens centre → combiner centre", `${fmt(g.L.distanceTo(g.C))} mm`],
+    ["Lens", "Ø12.7 × 5, curved face down"],
+    ["Lens flat face → mirror centre", `${OPT.FLAT_TO_M} mm`],
+    ["Mirror", `${MIRROR} × ${MIRROR}, ${fmt(g.mirrorAngle)}° to lens axis`],
+    ["Mirror centre → panel surface", `${fmt(P.focus - OPT.FLAT_TO_M, 2)} mm`],
+    ["Lens centre → combiner centre", `${OPT.LENS_TO_COMB} mm`],
     ["Combiner centre → eye", `${fmt(P.comb)} mm`],
     ["Combiner tilt (top edge away from you)", `${fmt(g.combTilt)}° from vertical`],
+    ["Lens axis leans back from vertical", `${fmt(Math.atan2(g.a.z, g.a.y) / D2R)}°`],
     ["Combiner lower edge in front of eye", warn(g.lashGap >= 8, `${fmt(g.lashGap)} mm`)],
     ["Combiner top edge → goggle lens", warn(g.topGap >= 1, `${fmt(g.topGap)} mm`)],
-    ["Slot in frame top", "32 × 16 mm"],
-    ["Slot centre, right of pupil", `${fmt(g.cross.x)} mm`],
-    ["Pod rises above frame", `${fmt(g.podTop - g.frameTop, 0)} mm`],
+    ["Housing front → goggle lens", warn(g.modFront >= 1, `${fmt(g.modFront)} mm`)],
+    ["Housing back → brow ridge", warn(g.modBackGap >= 1, `${fmt(g.modBackGap)} mm`)],
+    ["Housing top → frame (clip posts)", `${fmt(Math.max(g.roofGap, 0))} mm`],
+    ["Housing size (w × h × d)", `${fmt(g.modSize[0], 0)} × ${fmt(g.modSize[1], 0)} × ${fmt(g.modSize[2], 0)} mm`],
+    ["Panel flex needed to reach board", `≈ ${fmt(g.flexLen, 0)} mm`],
     ["Optical path, lens → eye", `${fmt(g.pathEye, 0)} mm`],
   ];
   $("sheet").innerHTML = rows.map(([k, v]) => `<tr><th>${k}</th><td class="v">${v}</td></tr>`).join("");
@@ -769,9 +815,9 @@ function readout(g) {
 
 // ---------------------------------------------------------------- views
 const VIEWS = {
-  overview: { pos: V3(210, 140, -250), target: V3(-6, 26, -6) },
-  side: { pos: V3(340, 34, -12), target: V3(0, 34, -12) },
-  front: { pos: V3(-14, 48, -400), target: V3(-14, 26, 0) },
+  overview: { pos: V3(150, 95, -170), target: V3(-12, 16, -12) },
+  side: { pos: V3(260, 18, -12), target: V3(0, 18, -12) },
+  front: { pos: V3(-16, 26, -300), target: V3(-16, 16, 0) },
 };
 const look = { yaw: 3, pitch: 9, fov: 64 };
 function applyVisibility() {
@@ -782,10 +828,9 @@ function applyVisibility() {
   if (rays) rays.visible = SHOW.rays && !pov;
   if (goggles) goggles.visible = SHOW.goggles || pov;
   head.visible = SHOW.head && !pov;
-  MAT.housing.opacity = (SHOW.xray && !pov) ? 0.22 : 1;
-  MAT.housing.depthWrite = !(SHOW.xray && !pov);
-  MAT.frame.opacity = (SHOW.xray && !pov) ? 0.55 : 1;
-  MAT.frame.depthWrite = !(SHOW.xray && !pov);
+  const xr = SHOW.xray && !pov;
+  MAT.housing.opacity = xr ? 0.22 : 1; MAT.housing.depthWrite = !xr;
+  MAT.frame.opacity = xr ? 0.55 : 1; MAT.frame.depthWrite = !xr;
   $("labels").hidden = !SHOW.labels || pov;
   $("legend").hidden = !SHOW.rays || pov;
   $("hint").textContent = pov
@@ -872,6 +917,5 @@ if (document.fonts && document.fonts.load) document.fonts.load("700 112px Montse
 requestAnimationFrame(frame);
 })();
 </script>
-
 </body>
 </html>
