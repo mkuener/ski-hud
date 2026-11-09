@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ski HUD</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --surface: #ffffff; --text: #111418; --muted: #5d6570;
+    --border: #d9dde3; --accent: #0b6bcb; --accent-text: #ffffff;
+    --ok: #1a7f37; --warn: #9a6700; --bad: #c62828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1114; --surface: #1a1d22; --text: #f2f4f7; --muted: #9aa3ae;
+      --border: #2c3138; --accent: #4c9cf0; --accent-text: #0f1114;
+      --ok: #4ac26b; --warn: #d4a72c; --bad: #f2716a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 480px; margin: 0 auto; display: grid; gap: 16px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .status { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 15px; }
+  .status dt { color: var(--muted); }
+  .status dd { margin: 0; font-weight: 600; }
+  .ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+  .readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center; }
+  .readout .value { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .readout .label { color: var(--muted); font-size: 14px; }
+  .readout.big { grid-column: 1 / -1; }
+  .readout.big .value { font-size: 88px; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button {
+    font: inherit; font-weight: 600; min-height: 52px; border-radius: 12px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  }
+  button.primary { grid-column: 1 / -1; background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .note { color: var(--muted); font-size: 14px; margin: 0; }
+  .note.bad { color: var(--bad); }
+  code { font-size: 13px; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ski HUD</h1>
+
+  <section class="card">
+    <dl class="status">
+      <dt>Goggles</dt><dd id="hud-status" class="bad">Not connected</dd>
+      <dt>Source</dt><dd id="src-status">Off</dd>
+      <dt>Last sent</dt><dd><code id="last-sent">–</code></dd>
+    </dl>
+  </section>
+
+  <section class="card readouts" aria-live="off">
+    <div class="readout big"><div class="value" id="v-spd">--</div><div class="label">km/h</div></div>
+    <div class="readout"><div class="value" id="v-alt">--</div><div class="label">altitude, m</div></div>
+    <div class="readout"><div class="value" id="v-vert">0</div><div class="label">vertical drop, m</div></div>
+  </section>
+
+  <section class="buttons">
+    <button class="primary" id="btn-connect">Connect goggles</button>
+    <button id="btn-gps" aria-pressed="false">Start GPS</button>
+    <button id="btn-demo" aria-pressed="false">Demo values</button>
+    <button id="btn-reset" style="grid-column: 1 / -1">Reset vertical drop</button>
+  </section>
+
+  <p class="note" id="note"></p>
+</main>
+
+<script>
+"use strict";
+
+// Must match firmware/src/phone_link.cpp.
+const DEVICE_NAME = "SkiHUD";
+const SERVICE_UUID = "5a1d0001-7c3e-4b8a-9f2d-1e6c3b8a4d70";
+const VALUES_UUID = "5a1d0002-7c3e-4b8a-9f2d-1e6c3b8a4d70";
+
+// Changed values go out at most every TICK_MS. The full state goes out at
+// least every HEARTBEAT_MS so the goggles can tell a paused page from a quiet
+// one (they blank after 5 s of silence).
+const TICK_MS = 200;
+const HEARTBEAT_MS = 1000;
+
+// Altitude must move this far past the last turning point before it counts
+// towards vertical drop. Filters GPS altitude jitter.
+const VERT_DEADBAND_M = 4;
+const MAX_ALT_ACCURACY_M = 25;
+
+const $ = (id) => document.getElementById(id);
+
+const state = { spd: null, alt: null, vert: loadVert() };
+let sent = {};
+let lastFullSendMs = 0;
+
+let device = null;
+let characteristic = null;
+let writing = false;
+let wantConnected = false;
+
+let source = "off";  // "off" | "gps" | "demo"
+let gpsWatch = null;
+let demoTimer = null;
+let wakeLock = null;
+
+// ---- Vertical drop ------------------------------------------------------
+
+let altSmooth = null;
+let altTurn = null;
+
+function loadVert() {
+  try { return Number(localStorage.getItem("skihud.vert")) || 0; } catch { return 0; }
+}
+
+function saveVert() {
+  try { localStorage.setItem("skihud.vert", String(state.vert)); } catch {}
+}
+
+function updateAltitude(altitude) {
+  altSmooth = altSmooth === null ? altitude : altSmooth + 0.3 * (altitude - altSmooth);
+  if (altTurn === null) altTurn = altSmooth;
+
+  if (altSmooth > altTurn + VERT_DEADBAND_M) {
+    altTurn = altSmooth;
+  } else if (altSmooth < altTurn - VERT_DEADBAND_M) {
+    state.vert += Math.round(altTurn - altSmooth);
+    altTurn = altSmooth;
+    saveVert();
+  }
+  state.alt = Math.round(altSmooth);
+}
+
+// ---- GPS ----------------------------------------------------------------
+
+let lastFix = null;
+
+function distanceM(a, b) {
+  const R = 6371000, rad = Math.PI / 180;
+  const dLat = (b.latitude - a.latitude) * rad, dLon = (b.longitude - a.longitude) * rad;
+  const h = Math.sin(dLat / 2) ** 2 +
+            Math.cos(a.latitude * rad) * Math.cos(b.latitude * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function onPosition(pos) {
+  const c = pos.coords;
+
+  // iOS reports -1 or null when it has no speed; fall back to distance/time.
+  let speed = c.speed;
+  if ((speed === null || speed < 0) && lastFix) {
+    const dt = (pos.timestamp - lastFix.timestamp) / 1000;
+    speed = dt > 0.5 ? distanceM(lastFix.coords, c) / dt : null;
+  }
+  lastFix = pos;
+  if (speed !== null && speed >= 0) state.spd = Math.round(speed * 3.6);
+
+  if (c.altitude !== null && (c.altitudeAccuracy === null || c.altitudeAccuracy <= MAX_ALT_ACCURACY_M))
+    updateAltitude(c.altitude);
+
+  setSourceStatus(`GPS ±${Math.round(c.accuracy)} m`, c.accuracy <= 20 ? "ok" : "warn");
+  render();
+}
+
+function onPositionError(err) {
+  // Without a fix the last speed is no longer true.
+  state.spd = null;
+  render();
+  const msg = err.code === err.PERMISSION_DENIED ? "Location permission denied" : "No GPS fix";
+  setSourceStatus(msg, err.code === err.PERMISSION_DENIED ? "bad" : "warn");
+}
+
+function startGps() {
+  if (!navigator.geolocation) return setNote("This browser has no location access.", true);
+  stopSource();
+  source = "gps";
+  lastFix = null;
+  altSmooth = null;
+  altTurn = null;
+  gpsWatch = navigator.geolocation.watchPosition(onPosition, onPositionError,
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  setSourceStatus("Waiting for GPS…", "warn");
+  keepAwake();
+  render();
+}
+
+// ---- Demo ---------------------------------------------------------------
+
+function startDemo() {
+  stopSource();
+  source = "demo";
+  const t0 = Date.now();
+  let alt = 2400;
+  demoTimer = setInterval(() => {
+    const t = (Date.now() - t0) / 1000;
+    state.spd = Math.round(35 + 25 * Math.sin(t / 4));
+    alt -= 1;
+    state.alt = alt;
+    state.vert += 1;
+    saveVert();
+    render();
+  }, 500);
+  setSourceStatus("Demo values", "warn");
+  keepAwake();
+  render();
+}
+
+function stopSource() {
+  if (gpsWatch !== null) navigator.geolocation.clearWatch(gpsWatch);
+  if (demoTimer !== null) clearInterval(demoTimer);
+  gpsWatch = demoTimer = null;
+  source = "off";
+  state.spd = null;
+  state.alt = null;
+  setSourceStatus("Off", "");
+}
+
+// ---- Bluetooth ----------------------------------------------------------
+
+async function connect() {
+  if (!navigator.bluetooth) {
+    return setNote("This browser can't use Bluetooth. On iPhone, open this page in the Bluefy browser.", true);
+  }
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: DEVICE_NAME }],
+      optionalServices: [SERVICE_UUID],
+    });
+  } catch (e) {
+    if (e.name !== "NotFoundError") setNote(`Bluetooth: ${e.message}`, true);  // NotFound = chooser cancelled
+    return;
+  }
+  device.addEventListener("gattserverdisconnected", onDisconnected);
+  wantConnected = true;
+  await attach();
+}
+
+async function attach() {
+  setHudStatus("Connecting…", "warn");
+  try {
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    characteristic = await service.getCharacteristic(VALUES_UUID);
+    sent = {};
+    lastFullSendMs = 0;
+    setHudStatus("Connected", "ok");
+    setNote("");
+  } catch (e) {
+    characteristic = null;
+    setHudStatus("Not connected", "bad");
+    setNote(`Bluetooth: ${e.message}`, true);
+    retryLater();
+  }
+}
+
+function onDisconnected() {
+  characteristic = null;
+  setHudStatus("Reconnecting…", "warn");
+  retryLater();
+}
+
+function retryLater() {
+  if (wantConnected && device) setTimeout(() => { if (!characteristic) attach(); }, 2000);
+}
+
+async function tick() {
+  if (!characteristic || writing) return;
+
+  const now = Date.now();
+  const full = now - lastFullSendMs >= HEARTBEAT_MS;
+  const fields = ["spd", "alt", "vert"].filter((k) => full || state[k] !== sent[k]);
+  if (fields.length === 0) return;
+
+  // "-" tells the goggles a value is unknown, so they show "--" instead of
+  // keeping an old number.
+  const msg = fields.map((k) => `${k}=${state[k] ?? "-"}`).join(";");
+  const write = characteristic.writeValueWithResponse ?? characteristic.writeValue;
+  writing = true;
+  try {
+    await write.call(characteristic, new TextEncoder().encode(msg));
+    for (const k of fields) sent[k] = state[k];
+    if (full) lastFullSendMs = now;
+    $("last-sent").textContent = msg;
+  } catch (e) {
+    // A failed write usually means the link dropped; the disconnect handler retries.
+  } finally {
+    writing = false;
+  }
+}
+
+// ---- Screen -------------------------------------------------------------
+
+async function keepAwake() {
+  if (!("wakeLock" in navigator)) {
+    return setNote("Can't keep the screen on from here. Set Settings → Display & Brightness → Auto-Lock to Never while skiing.");
+  }
+  try { wakeLock = await navigator.wakeLock.request("screen"); } catch {}
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && source !== "off") keepAwake();
+});
+
+// ---- UI -----------------------------------------------------------------
+
+function setHudStatus(text, cls) { const el = $("hud-status"); el.textContent = text; el.className = cls; }
+function setSourceStatus(text, cls) { const el = $("src-status"); el.textContent = text; el.className = cls; }
+function setNote(text, bad = false) { const el = $("note"); el.textContent = text; el.className = bad ? "note bad" : "note"; }
+
+function render() {
+  $("v-spd").textContent = state.spd ?? "--";
+  $("v-alt").textContent = state.alt ?? "--";
+  $("v-vert").textContent = state.vert;
+  $("btn-gps").setAttribute("aria-pressed", source === "gps");
+  $("btn-demo").setAttribute("aria-pressed", source === "demo");
+  $("btn-gps").textContent = source === "gps" ? "Stop GPS" : "Start GPS";
+  $("btn-demo").textContent = source === "demo" ? "Stop demo" : "Demo values";
+}
+
+$("btn-connect").addEventListener("click", connect);
+$("btn-gps").addEventListener("click", () => { source === "gps" ? stopSource() : startGps(); render(); });
+$("btn-demo").addEventListener("click", () => { source === "demo" ? stopSource() : startDemo(); render(); });
+$("btn-reset").addEventListener("click", () => {
+  state.vert = 0;
+  altTurn = altSmooth;
+  saveVert();
+  render();
+});
+
+if (!navigator.bluetooth) setNote("This browser can't use Bluetooth. On iPhone, open this page in the Bluefy browser.", true);
+setInterval(tick, TICK_MS);
+render();
+</script>
+</body>
+</html>
