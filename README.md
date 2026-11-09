@@ -9,3 +9,7 @@ Open it at https://mkuener.github.io/ski-hud/ in a browser with Web Bluetooth. O
 3. Keep the screen on (Auto-Lock → Never if the page can't do it itself).
 
 The goggles show `--` for anything unknown, and blank everything if the page stops sending for 5 seconds.
+
+## Optics bench
+
+https://mkuener.github.io/ski-hud/optics/ is a real-scale 3D model of the HUD optics in the goggles: panel, f30 doublet, 45° mirror and film combiner, with live ray tracing, an eye view and a build sheet. Source: [optics/index.html](optics/index.html).
