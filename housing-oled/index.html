@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HUD Housing B · OLED</title>
+<meta name="description" content="Variant B housings for the ski goggle HUD with a 0.96 inch 128x64 SSD1306 I2C OLED: screen pod with stem, frame bar, bench test fixture and strap pack, with collision check, print sheet and STL downloads.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#0b0f12; --viewport:#0f1519; --panel:#131a1f; --raise:#18222a; --line:#24313b;
+  --fg:#dbe3e8; --muted:#8797a3; --accent:#7fd3ff; --ok:#5dff8f; --cyan:#45c8ff; --warn:#ff7a59; --amber:#e9a23b;
+  --ui:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:14px;line-height:1.45}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 460px;height:100%}
+.stage{position:relative;min-width:0;min-height:0;background:var(--viewport);overflow:hidden}
+#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#c:active{cursor:grabbing}
+#labels{position:absolute;inset:0;pointer-events:none}
+.bar{position:absolute;top:12px;left:12px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 24px)}
+.seg{display:flex;flex-wrap:wrap;gap:2px;background:rgba(11,15,18,.85);border:1px solid var(--line);border-radius:6px;padding:2px;backdrop-filter:blur(6px)}
+.seg button{font:500 13px var(--ui);color:var(--muted);background:none;border:0;border-radius:4px;padding:6px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--fg);box-shadow:inset 0 -2px 0 var(--accent)}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hint{position:absolute;left:12px;bottom:12px;font:12px var(--mono);color:var(--muted);background:rgba(11,15,18,.75);padding:4px 8px;border-radius:4px;max-width:calc(100% - 24px)}
+#busy{position:absolute;inset:0;display:grid;place-items:center;font:500 14px var(--mono);color:var(--muted);background:rgba(15,21,25,.6);pointer-events:none}
+.lbl{font:600 12px var(--mono);color:var(--fg);background:rgba(11,15,18,.82);border:1px solid var(--line);border-left:3px solid var(--cyan);padding:2px 6px;border-radius:3px;white-space:nowrap;transform:translateY(-14px)}
+.lbl small{display:block;font:400 11px var(--ui);color:var(--muted)}
+.hidelbl .lbl{display:none}
+aside{background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:16px 18px 48px}
+h1{font:600 20px var(--ui);margin:0 0 2px}
+.variant{display:inline-block;font:600 11px var(--mono);letter-spacing:.06em;color:#0b0f12;background:var(--accent);border-radius:3px;padding:1px 6px;margin-right:6px;vertical-align:2px}
+.sub{color:var(--muted);margin:0 0 12px}
+h2{font:600 13px var(--ui);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:22px 0 8px}
+.card{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:8px 0}
+.card h3{margin:0 0 4px;font:600 15px var(--ui)}
+.card p{margin:4px 0;color:#c5d0d7}
+.ok{border-left:3px solid var(--ok)} .bad{border-left:3px solid var(--warn)} .info{border-left:3px solid var(--cyan)} .warnc{border-left:3px solid var(--amber)}
+table{width:100%;border-collapse:collapse;font:12px var(--mono)}
+th,td{text-align:left;padding:4px 5px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.n{text-align:right;white-space:nowrap}
+ul,ol{margin:6px 0;padding-left:18px} li{margin:3px 0}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 6px;border-radius:3px;border:1px solid var(--line);margin-right:4px}
+.tag.petg{color:var(--cyan);border-color:#21465a} .tag.tpu{color:var(--amber);border-color:#5a4521}
+.tag.ds{color:var(--amber);border-color:#5a4521} .tag.me{color:var(--ok);border-color:#2d5a3a}
+.param{display:grid;grid-template-columns:1fr 92px 62px;gap:8px;align-items:center;margin:6px 0;font:12px var(--mono)}
+.param input[type=range]{width:100%;accent-color:var(--accent)}
+.param input[type=number]{width:100%;font:12px var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:2px 4px;text-align:right}
+.mod{display:grid;grid-template-columns:1fr 70px 64px;gap:8px;align-items:center;margin:4px 0;font:12px var(--mono)}
+.mod input{width:100%;font:12px var(--mono);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:2px 4px;text-align:right}
+.mod.changed input{border-color:#2d5a3a}
+.check{display:flex;gap:8px;align-items:baseline;margin:4px 0}
+.check b{font:600 12px var(--mono)} .yes{color:var(--ok)} .no{color:var(--warn)}
+.dl{font:500 12px var(--mono);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:4px;padding:3px 8px;cursor:pointer}
+.dl:hover{border-color:var(--accent)} .dl:focus-visible{outline:2px solid var(--accent);outline-offset:1px} .dl:disabled{opacity:.5;cursor:wait}
+td small{display:block;font:400 11px var(--ui);color:var(--muted)}
+tr.grp td{color:var(--accent);font:600 12px var(--ui);text-transform:uppercase;letter-spacing:.06em;padding-top:10px}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto}
+  .stage{height:60vh}
+  aside{border-left:0;border-top:1px solid var(--line);padding:16px 16px 48px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="3D view of the variant B housings"></canvas>
+    <div id="labels"></div>
+    <div class="bar">
+      <div class="seg" role="group" aria-label="View">
+        <button data-view="hud" aria-pressed="true">Goggle end</button>
+        <button data-view="bench" aria-pressed="false">Bench fixture</button>
+        <button data-view="pack" aria-pressed="false">Strap pack</button>
+        <button data-view="all" aria-pressed="false">Assembly</button>
+      </div>
+      <div class="seg" role="group" aria-label="Display">
+        <button id="bExplode" aria-pressed="false">Explode</button>
+        <button id="bXray" aria-pressed="false">X-ray</button>
+        <button id="bSection" aria-pressed="false">Section</button>
+        <button id="bLabels" aria-pressed="true">Labels</button>
+      </div>
+    </div>
+    <div class="hint">Real scale, mm · drag to orbit · scroll to zoom · click a part</div>
+    <div id="busy">Building CAD model…</div>
+  </div>
+  <aside>
+    <h1><span class="variant">VARIANT B</span>OLED housing</h1>
+    <p class="sub">For the 0.96″ 128×64 SSD1306 I2C OLED (ETH SPH item F04, pins VDD GND SCK SDA). Variant A (colour LCD) is in <code>../housing/</code> and is not touched here. No screws, only USB-C reachable, PETG + TPU 95A, no supports. Every part downloads as an STL already turned to its print orientation.</p>
+
+    <div class="card info" id="info"><h3>Click a part</h3><p>Every printed part and component explains what it does and how it fits.</p></div>
+
+    <h2>Fit check</h2>
+    <div id="checks"></div>
+
+    <h2>Print sheet</h2>
+    <p class="sub" style="margin:0 0 6px">0.4 mm nozzle. PETG 235–245 °C, TPU 95A 225 °C slow (20–25 mm/s). Times are rough for a typical printer.</p>
+    <table id="parts"><thead><tr><th>Part · orientation</th><th>Layer · infill</th><th class="n">≈min</th><th class="n">g</th><th class="n">STL</th></tr></thead><tbody></tbody></table>
+    <p style="margin:8px 0"><button class="dl" id="dlAll">Download all STL files</button> <button class="dl" id="dlBench">Bench set only</button> <span class="sub" id="dlMsg"></span></p>
+    <p class="sub">The same files are written to <code>site-src/housing-oled/stl/</code> by <code>export-stl.cjs</code> (default values). After changing a measurement, download from here.</p>
+
+    <h2>Your goggles <span class="tag me">measure</span></h2>
+    <p class="sub" style="margin:0 0 4px">Defaults are guesses. Measure, set them, the parts rebuild.</p>
+    <div id="params"></div>
+
+    <h2>OLED module <span class="tag ds">datasheet: verify</span></h2>
+    <p class="sub" style="margin:0 0 4px">From the common mechanical drawing of this module (lcdwiki MC096GX). Check each with calipers on your board tomorrow and type the real value. Green border = changed from the drawing.</p>
+    <div id="modparams"></div>
+
+    <h2>What to measure</h2>
+    <ol>
+      <li><b>OLED board</b> (calipers): PCB width × height, PCB thickness, glass thickness above the PCB, the gap from the pin edge to the glass, the tallest part on the back. If the header is fitted: glass front to pin tips.</li>
+      <li><b>Frame rail at the top centre:</b> thickness from the top surface to the inside surface (<i>railT</i>), and its depth front-to-back (<i>railD</i>).</li>
+      <li><b>Top vent windows</b> ✓ measured: centre window 26.13 × 10.19 mm, ribs 4 mm. Still useful: the window's front-to-back width at its <i>middle</i> (the windows have a step), for <i>stemD</i>. Cut a slit in the vent foam strip under the centre window for the stem.</li>
+      <li><b>Lens seat:</b> the bar must stay behind the rail's front edge where the lens sits (<i>barZ</i>).</li>
+      <li><b>Lens gap:</b> from the vent centre forward to the inside of the lens, about 3–5 mm below the rail (<i>lensGap</i>). The fit check needs the pod to stay 1 mm short of it.</li>
+      <li><b>Face foam</b> thickness behind the rail (<i>foamD</i>, for the bench clip only).</li>
+      <li><b>Cable</b> outer diameter (<i>cableD</i>). Default 4.6 mm = variant A's coil, so the pack boot is the same.</li>
+      <li><b>Strap</b> width and thickness (pack clamp plate).</li>
+    </ol>
+
+    <h2>Design</h2>
+    <div class="card">
+      <h3>Bench fixture (print first, tomorrow morning)</h3>
+      <ul>
+        <li><b>Clip</b> slides onto the goggle's top edge from behind, jaws over the frame rail, spine behind the face foam. A 0.5 mm bump grips; no goggle measurement needed beyond <i>railT</i> and <i>foamD</i>.</li>
+        <li><b>Cradle</b> holds the OLED <b>upside down</b> (pins at the bottom) so the Dupont plugs point back and down, clear of the frame. Slide the board in from the top between the grooves; it sits on the bottom bar.</li>
+        <li><b>Hinge:</b> 34 mm of 1.75 mm filament through the ears and the clip's cheeks. The cheeks are 0.1 mm wider than the gap: it holds any angle by friction. Find the best angle, read it with a phone angle app, and put it in <i>tilt</i> for the final pod.</li>
+        <li>The board is upside down, and the lens mirrors the image: flip it in firmware (SSD1306 segment remap 0xA0/0xA1 and COM scan 0xC0/0xC8).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Screen pod + stem</h3>
+      <ul>
+        <li><b>Body</b> holds the board face to the lens behind a 22.7 × 11.9 mm window over the active area (45° chamfer). The PCB front rests on four corner pads, clear of the glass and the panel flex; it locates on its outline (0.2 mm clearance).</li>
+        <li><b>Light hood:</b> brow over the top (stops vent light), straight cheeks, chin flared 45° (stops your eye seeing the panel from below, never cuts the rays going down to the lens).</li>
+        <li><b>Lid</b> clicks into the back with two side tabs; four corner posts press the PCB onto the pads. Push a pin into the side windows to open it.</li>
+        <li><b>Stem</b> on the body goes up through the vent and clicks into the bar floor. Pod and bar clamp the rail: the bearing pads sit on the ribs either side of the window. The 4 wires run up the channel between the stem's arms. A clear 0.5 mm sheet sits in a pocket behind the window.</li>
+        <li>For the goggle pod the pin header has to go: cut the plastic carrier off, snip the pins to about 1 mm, solder the 4 wires to the stubs from behind.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Frame bar + 4-wire route</h3>
+      <ul>
+        <li>One 4-core cable from the pack (VDD 3.3 V, GND, SCK, SDA) enters through the TPU boot at the +X end. Inside, a <b>cable clamp</b> (saddle in the base, post in the lid, two 0.3 mm ribs) grips the jacket: strain relief, a pull never reaches a solder joint.</li>
+        <li>The wires go to the IMU's pads (VIN GND SCL SDA); from the same pads 4 short wires go back along the floor, down the stem channel, into the pod's top hole and to the OLED pads. Both chips share the I2C bus (OLED 0x3C, ICM-20948 0x68/0x69).</li>
+        <li>A drop of hot glue or silicone in the pod's wire hole stops the wires rubbing.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Strap pack</h3>
+      <ul>
+        <li>Same as variant A (ESP32 Lite + 103450 LiPo), copied here with the cable diameter as a parameter. The internal service connector becomes 4-pin (JST 1.25). With the default 4.6 mm cable the STLs match variant A's pack.</li>
+      </ul>
+    </div>
+
+    <h2>Assembly order</h2>
+    <ol>
+      <li><b>Bench test:</b> slide the OLED into the cradle (glass toward the front lips, pins at the bottom). Push the filament pin through ear, cheek, cheek, ear (clip cheeks between the ears). Plug 4 Dupont jumpers: VDD→3V3, GND→GND, SCK→GPIO22, SDA→GPIO21 (check with the firmware). Push the clip onto the goggle's top edge from behind, look through the goggles, set the angle.</li>
+      <li><b>Goggle pod:</b> remove the header, solder 4 wires (about 60 mm, 26–28 AWG silicone) to the pads from behind, thread them out through the body's top hole and up the stem channel. Board into the body, lid clicks on.</li>
+      <li>From inside the goggle push the stem up through the vent and the bar base's floor slot until it clicks.</li>
+      <li>Cable through the bar boot and over the clamp saddle; solder cable and pod wires to the IMU pads; IMU onto its pads; lid on (it squeezes the clamp).</li>
+      <li>Pack: as variant A, with a 4-pin JST 1.25 pair as the internal disconnect.</li>
+    </ol>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@jscad/modeling@2.12.5/dist/jscad-modeling.min.js"></script>
+<script src="cad.js"></script>
+<script>
+"use strict";
+const STL_URL="https://cdn.jsdelivr.net/npm/@jscad/stl-serializer@2.1.20/+esm";
+const DENS={PETG:1.27,TPU:1.21};
+const GROUP_NAME={bench:"Bench fixture (tomorrow)",hud:"Goggle end",pack:"Strap pack (same as variant A)"};
+const INFO={
+  pod_body:"Holds the OLED face to the lens. Window over the 21.74 × 10.86 active area with a 45° chamfer, light hood (brow, cheeks, flared chin), corner pads for the PCB front, release windows for the lid tabs, wire hole in the top wall. The snap stem rises from the top wall.",
+  pod_lid:"Back cover. Lip inside the walls, two side snap tabs (0.45 mm bumps), four corner posts press the PCB onto the body's pads. Cut-out at the top for the wires.",
+  bar_base:"Sits on the frame over the vent. IMU on four pads, floor slot catches the pod's stem, cable clamp saddle and boot notch at the +X end.",
+  bar_lid:"Snaps onto the bar base (four bumps into blind pockets). Four posts hold the IMU, the clamp post squeezes the cable.",
+  bar_boot:"TPU 95A strain-relief boot where the cable enters the bar. Flange sits inside the wall.",
+  bench_clip:"Slides onto the goggle's top edge from behind: top jaw on the frame, spine behind the face foam, bottom jaw under the rail. Two cheeks at the front carry the hinge.",
+  bench_cradle:"Holds the OLED upside down in two side grooves (front lip on the glass edge, back lip on the PCB back), sitting on the bottom bar. Ears take the filament hinge pin.",
+  pack_base:"Variant A's pack base: battery cradle, cable boot hole, snap pockets, strap-plate grooves, weep holes.",pack_lid:"Variant A's pack lid: button pocket, board posts, USB-C tunnel walls.",pack_plate:"Strap clamp plate, snaps under the pack.",button_cap:"TPU button cap.",port_plug:"TPU USB-C plug with tether.",pack_boot:"TPU cable boot at the pack.",
+  "c:oled_pcb":"OLED board, 27.3 × 27.8 × 1.2 mm (datasheet, verify).","c:oled_glass":"Glass panel 26.7 × 19.27, 4.27 mm from the pin edge.","c:oled_aa":"Active area 21.74 × 10.86 mm, 2.1 mm below the glass edge.","c:oled_flexF":"Panel flex, bent round the far edge of the glass.","c:oled_flexB":"Panel flex on the PCB back.","c:oled_back":"Parts on the PCB back (regulator, caps): 1.5 mm assumed.","c:oled_solder":"Solder joints where the header was.","c:oled_wires":"4 wires (VDD GND SCK SDA) out through the top wall.","c:oled_header":"Pin header carrier (pins out the back).","c:oled_dupont":"4 female Dupont jumpers.","c:oled_pin":"Hinge pin: a 34 mm piece of 1.75 mm filament.",
+  "c:imu":"ICM-20948 IMU board.","c:cable":"4-core cable to the pack (use a spare core for the light sensor).","c:oled_sheet":"Clear 0.5 mm sheet (ETH SPH cast sheet), cut to size: keeps fog and snow off the OLED glass.","c:ldr":"5 mm LDR (GL5528) for auto-brightness: one leg to 3.3 V, the other to a spare cable core → ESP32 ADC pin with a 10 kΩ resistor to GND in the pack.","c:battery":"103450 LiPo.","c:pcb":"ESP32 Lite.","c:usb":"USB-C: the only reachable port.","c:connector":"4-pin JST 1.25 pair, internal service disconnect.","c:coil":"Cable tail into the pack boot.","c:switch":"12×12×4.3 tactile switch.","route":"The 4-wire route: cable → IMU pads → back along the floor → down the stem channel → OLED pads."
+};
+
+// ---------- three.js ----------
+const canvas=document.getElementById("c"), stage=document.getElementById("stage");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.localClippingEnabled=true;
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0f1519);
+const camera=new THREE.PerspectiveCamera(35,1,1,5000);
+const controls=new THREE.OrbitControls(camera,canvas); controls.enableDamping=true;
+const labelRenderer=new THREE.CSS2DRenderer(); labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none"; document.getElementById("labels").appendChild(labelRenderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdfeeff,0x1a1410,0.9));
+const key=new THREE.DirectionalLight(0xffffff,0.8); key.position.set(-150,300,220); scene.add(key);
+const fill=new THREE.DirectionalLight(0x88aaff,0.35); fill.position.set(250,80,-250); scene.add(fill);
+const clip=new THREE.Plane(new THREE.Vector3(-1,0,0),0); let sectionOn=false;
+const mk=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.05,side:THREE.DoubleSide},o));
+const MAT={PETG:mk(0x2a2f36,{roughness:.6}),TPU:mk(0x3b6fd1,{roughness:.8}),battery:mk(0xb9bdc2,{metalness:.5,roughness:.35}),pcb:mk(0x111519),pcbBlue:mk(0x1c3f8c),pcbIMU:mk(0x141a2c),
+  steel:mk(0xc9ced3,{metalness:.9,roughness:.25}),cream:mk(0xeee3c8,{roughness:.8}),chip:mk(0x1d1f22),shrink:mk(0x3a3a3a,{roughness:.9}),cable:mk(0x151515),foam:mk(0xd8b24a,{roughness:.9}),
+  glass:mk(0x0a0c10,{roughness:.1,metalness:.4}),oled:mk(0x0a0c10,{emissive:0x7fd3ff,emissiveIntensity:.9}),flex:mk(0xc8862a,{roughness:.6}),dupont:mk(0x101010,{roughness:.7}),
+  wire:mk(0xff9a3c,{roughness:.6}),sheet:mk(0xbfe6ff,{transparent:true,opacity:.35,roughness:.05}),ldr:mk(0xd9a441,{roughness:.4}),ghost:mk(0xd9a441,{transparent:true,opacity:.25}),rail:mk(0x3a3f45,{transparent:true,opacity:.55}),gfoam:mk(0x3d4652,{transparent:true,opacity:.35,roughness:1})};
+const PART_COL={pod_body:0x2f353e,pod_lid:0x262a31,bar_base:0x2b3038,bar_lid:0x343a44,bench_clip:0x3a4450,bench_cradle:0x2b3038,pack_base:0x2b3038,pack_lid:0x343a44,pack_plate:0x23272d,button_cap:0x3b6fd1};
+
+function toThree(geom){
+  const pos=[]; for(const p of OledCAD.toPolygons(geom)){const v=p.vertices;for(let i=1;i<v.length-1;i++){pos.push(...v[0],...v[i],...v[i+1]);}}
+  const g=new THREE.BufferGeometry(); g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); g.computeVertexNormals(); return g;
+}
+const pickables=[]; let built=null, groups={};
+const frames={hud:new THREE.Group(),bench:new THREE.Group(),pack:new THREE.Group()}, ctx=new THREE.Group();
+scene.add(frames.hud,frames.bench,frames.pack,ctx);
+
+// pack placement on the strap (right side of the head), as in variant A
+const HEAD={cz:-110,a:95,b:154,t:1.375};
+function strapPoint(t){return new THREE.Vector3(HEAD.a*Math.sin(t),0,HEAD.cz+HEAD.b*Math.cos(t));}
+function placePack(railT){
+  const y0=-(47.5-railT), p=strapPoint(HEAD.t); p.y=y0;
+  const tang=new THREE.Vector3(HEAD.a*Math.cos(HEAD.t),0,-HEAD.b*Math.sin(HEAD.t)).normalize();
+  const n=new THREE.Vector3(p.x/HEAD.a**2,0,(p.z-HEAD.cz)/HEAD.b**2).normalize();
+  const Z=new THREE.Vector3().crossVectors(tang,n);
+  const m=new THREE.Matrix4().makeBasis(tang,n,Z); m.setPosition(p.clone().addScaledVector(n,1.25));
+  frames.pack.matrixAutoUpdate=false; frames.pack.matrix.copy(m); frames.pack.updateMatrixWorld(true);
+}
+function clearGroup(g){for(const c of [...g.children]){g.remove(c);c.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.element)o.element.remove();});}}
+function label(text,sub,pos,parent){const d=document.createElement("div");d.className="lbl";d.innerHTML=text+(sub?"<small>"+sub+"</small>":"");const o=new THREE.CSS2DObject(d);o.position.copy(pos);parent.add(o);return o;}
+
+function buildScene(R){
+  pickables.length=0; for(const k in frames) clearGroup(frames[k]); clearGroup(ctx); groups={};
+  for(const k in R.parts){const p=R.parts[k],mat=MAT[p.material].clone(); if(PART_COL[k]) mat.color.setHex(PART_COL[k]);
+    const m=new THREE.Mesh(toThree(p.geom),mat); m.userData={name:k,part:true}; frames[p.group].add(m); pickables.push(m); groups[k]=m;}
+  for(const g of ["hud","bench","pack"]) for(const k in R[g].comps){const c=R[g].comps[k];const m=new THREE.Mesh(toThree(c.geom),MAT[c.kind]||MAT.chip);m.userData={name:"c:"+k};frames[g].add(m);pickables.push(m);}
+  for(const g of ["hud","bench"]){const rail=new THREE.Mesh(toThree(R[g].rail),MAT.rail);rail.userData={ctx:"rail"};frames[g].add(rail);}
+  const foam=new THREE.Mesh(toThree(R.bench.foam),MAT.gfoam); foam.userData={ctx:"foam"}; frames.bench.add(foam);
+  // 4-wire route
+  const curve=new THREE.CatmullRomCurve3(R.hud.route.map(p=>new THREE.Vector3(...p)),false,"centripetal");
+  const route=new THREE.Mesh(new THREE.TubeGeometry(curve,160,0.6,8,false),MAT.wire); route.userData={name:"route"}; frames.hud.add(route); pickables.push(route);
+  label("Frame bar",`${R.hud.dims.bar.map(v=>v.toFixed(0)).join(" × ")} mm · IMU + clamp`,new THREE.Vector3(16,R.P.railT+14,-12),frames.hud);
+  label("Screen pod",`${R.hud.dims.pod.map(v=>v.toFixed(1)).join(" × ")} mm · tilt ${R.P.tilt}°`,new THREE.Vector3(-24,-20,4),frames.hud);
+  label("Bench clip","slides on from behind",new THREE.Vector3(-12,R.P.railT+6,-R.P.railD/2-R.P.foamD),frames.bench);
+  label("OLED cradle",`friction hinge · shown at ${R.P.benchTilt}°`,new THREE.Vector3(-22,-26,4),frames.bench);
+  label("Strap pack",`${R.pack.dims.L.toFixed(0)} × ${R.pack.dims.W.toFixed(0)} × ${R.pack.dims.T.toFixed(1)} mm`,new THREE.Vector3(-36,26,-26),frames.pack);
+  placePack(R.P.railT); buildContext(R);
+  applyExplode(explodeK); applyXray(); applySection(); go(view,true);
+}
+
+// ---------- context: goggle frame, lens, strap, cable (not printed) ----------
+function bentRing(railT,depth){
+  const R=120, sh=new THREE.Shape(), rr=(s,x0,y0,x1,y1,r)=>{s.moveTo(x0+r,y0);s.lineTo(x1-r,y0);s.quadraticCurveTo(x1,y0,x1,y0+r);s.lineTo(x1,y1-r);s.quadraticCurveTo(x1,y1,x1-r,y1);s.lineTo(x0+r,y1);s.quadraticCurveTo(x0,y1,x0,y1-r);s.lineTo(x0,y0+r);s.quadraticCurveTo(x0,y0,x0+r,y0);};
+  rr(sh,-90,-47.5,90,47.5,30); const hole=new THREE.Path(); rr(hole,-80,-35.5,80,47.5-railT,22); sh.holes.push(hole);
+  const g=new THREE.ExtrudeGeometry(sh,{depth,bevelEnabled:false,curveSegments:16}); g.translate(0,-(47.5-railT),-depth/2);
+  const p=g.attributes.position; for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),a=x/R;p.setX(i,(R+z)*Math.sin(a));p.setZ(i,(R+z)*Math.cos(a)-R);} g.computeVertexNormals(); return g;
+}
+function buildContext(R){
+  const railT=R.P.railT, y0=-(47.5-railT);
+  const ring=new THREE.Mesh(bentRing(railT,R.P.railD),mk(0x30353b,{transparent:true,opacity:.45})); ring.userData={ctx:"frame"}; ctx.add(ring);
+  // inner lens surface passes through (0, -5, lensGap)
+  const LR=125, zc=R.P.lensGap-Math.sqrt(LR*LR-(-5-y0)**2);
+  const lens=new THREE.Mesh(new THREE.SphereGeometry(LR,48,24,Math.PI/2-0.72,1.44,Math.PI/2-0.42,0.84),mk(0x5a6a80,{transparent:true,opacity:.16,metalness:.3,roughness:.1,depthWrite:false}));
+  lens.position.set(0,y0,zc); lens.userData={ctx:"lens"}; ctx.add(lens);
+  const pts=[]; for(let t=-1.95;t<=1.95;t+=0.05){const p=strapPoint(t);p.y=y0;pts.push(p);}
+  const shape=new THREE.Shape(); shape.moveTo(-R.P.strapW/2,-R.P.strapT/2); shape.lineTo(R.P.strapW/2,-R.P.strapT/2); shape.lineTo(R.P.strapW/2,R.P.strapT/2); shape.lineTo(-R.P.strapW/2,R.P.strapT/2); shape.closePath();
+  const strap=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{steps:160,extrudePath:new THREE.CatmullRomCurve3(pts),bevelEnabled:false}),mk(0x1b1f24,{roughness:.95})); strap.userData={ctx:"strap"}; ctx.add(strap);
+  const a=new THREE.Vector3(...R.pack.glandOut).applyMatrix4(frames.pack.matrix), b=new THREE.Vector3(...R.hud.glandOut);
+  const guide=new THREE.CatmullRomCurve3([a,new THREE.Vector3(a.x-2,a.y+4,a.z+18),new THREE.Vector3(86,y0+30,-36),new THREE.Vector3(78,railT+6,-26),new THREE.Vector3(66,railT+5,-10),new THREE.Vector3(b.x+8,b.y,b.z),b]);
+  const cable=new THREE.Mesh(new THREE.TubeGeometry(guide,400,R.P.cableD/2,8,false),MAT.cable); cable.userData={ctx:"cable"}; ctx.add(cable);
+}
+
+// ---------- explode / x-ray / section ----------
+let explodeK=0, explodeTarget=0;
+function applyExplode(k){ if(!built) return; const E=Object.assign({},built.pack.explode,built.hud.explode,built.bench.explode);
+  for(const n in groups){const e=E[n]||[0,0,0];groups[n].position.set(e[0]*k,e[1]*k,e[2]*k);} }
+let xray=false; function applyXray(){for(const n in groups){const m=groups[n].material;m.transparent=xray;m.opacity=xray?0.28:1;m.depthWrite=!xray;m.needsUpdate=true;}}
+function applySection(){const planes=sectionOn?[clip]:[]; scene.traverse(o=>{if(o.material&&!o.isCSS2DObject){o.material.clippingPlanes=planes;}});}
+function updateClip(){
+  if(view==="pack"||view==="all"){const m=frames.pack.matrix,z=new THREE.Vector3().setFromMatrixColumn(m,2).normalize(),o=new THREE.Vector3().setFromMatrixPosition(m);clip.setFromNormalAndCoplanarPoint(z,o.clone().addScaledVector(z,-6.0));}
+  else clip.set(new THREE.Vector3(-1,0,0),0);   // cut through the middle (X = 0): stem, wire channel, pod, cradle, clip
+}
+
+// ---------- views ----------
+let view="hud", tween=null;
+function packCenter(){return new THREE.Vector3(0,11,0).applyMatrix4(frames.pack.matrix);}
+function poseFor(v){
+  if(v==="pack"){const c=packCenter(),n=new THREE.Vector3().setFromMatrixColumn(frames.pack.matrix,1);return {t:c,p:c.clone().addScaledVector(n,70).add(new THREE.Vector3(0,160,40)),r:55};}
+  if(v==="hud"){const t=new THREE.Vector3(12,-8,0);return {t,p:t.clone().add(new THREE.Vector3(110,40,95)),r:42};}
+  if(v==="bench"){const t=new THREE.Vector3(0,-14,-8);return {t,p:t.clone().add(new THREE.Vector3(120,30,60)),r:36};}
+  const t=new THREE.Vector3(30,-25,-50);return {t,p:t.clone().add(new THREE.Vector3(260,170,240)),r:150};
+}
+function fitPose(v){const e=poseFor(v);const dir=e.p.clone().sub(e.t).normalize();const vf=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(vf/2)*camera.aspect);const d=e.r/Math.sin(Math.min(vf,hf)/2);return {t:e.t,p:e.t.clone().addScaledVector(dir,d)};}
+let firstPose=true;
+function go(v,instant){view=v;document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===v));
+  frames.hud.visible=(v==="hud"||v==="all"); frames.bench.visible=(v==="bench"); frames.pack.visible=(v==="pack"||v==="all");
+  ctx.children.forEach(o=>{const n=o.userData.ctx; o.visible = v==="all" || (v!=="pack" && (n==="frame"||n==="lens"));});
+  frames.hud.children.forEach(o=>{if(o.userData.ctx==="rail")o.visible=(v!=="all");});
+  for(const k in frames) frames[k].children.forEach(o=>{if(o.isCSS2DObject)o.visible=frames[k].visible;});   // CSS2D ignores parent visibility
+  updateClip(); applySection();
+  if(instant&&!firstPose) return; firstPose=false;
+  const e=fitPose(v); if(instant){camera.position.copy(e.p);controls.target.copy(e.t);} else tween={s:{p:camera.position.clone(),t:controls.target.clone()},e,t0:performance.now()};}
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>go(b.dataset.view));
+const toggle=(id,fn)=>{const b=document.getElementById(id);b.onclick=()=>{const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);fn(on);};};
+toggle("bExplode",on=>explodeTarget=on?1:0);
+toggle("bXray",on=>{xray=on;applyXray();});
+toggle("bSection",on=>{sectionOn=on;updateClip();applySection();});
+toggle("bLabels",on=>stage.classList.toggle("hidelbl",!on));
+
+// ---------- picking ----------
+const ray=new THREE.Raycaster(), mouse=new THREE.Vector2(); let downAt=null;
+canvas.addEventListener("pointerdown",e=>downAt=[e.clientX,e.clientY]);
+canvas.addEventListener("pointerup",e=>{if(!downAt||Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>5)return;const r=canvas.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mouse,camera);
+  const vis=pickables.filter(o=>{let p=o;while(p){if(!p.visible)return false;p=p.parent;}return true;});
+  const hits=ray.intersectObjects(vis,false); const h=hits.find(x=>!(xray&&x.object.userData.part))||hits[0]; if(h) showInfo(h.object.userData.name);});
+function compLabel(n){for(const g of ["hud","bench","pack"]){const c=built[g].comps[n.slice(2)];if(c)return c.label;}return n;}
+function showInfo(n){
+  const p=built&&built.parts[n];
+  const head=p?`${p.label} <span class="tag ${p.material.toLowerCase()}">${p.material}</span>`:(n.startsWith("c:")?compLabel(n):"4-wire route");
+  const extra=p?`<p>${p.size.join(" × ")} mm · ${(p.volume/1000*DENS[p.material]).toFixed(1)} g · print ${p.print}</p>`:"";
+  document.getElementById("info").innerHTML=`<h3>${head}</h3><p>${INFO[n]||""}</p>${extra}`;
+}
+
+// ---------- panel ----------
+const PARAMS=[["railT","Rail height (front/back walls) ✓ measured",3,16,0.1,"mm"],["ribT","Rib thickness (top bars) ✓ measured",1,6,0.1,"mm"],["railD","Rail depth, face edge to lens ✓ ~measured",10,26,0.5,"mm"],["ventL","Centre vent window length ✓ measured",11.5,32,0.1,"mm"],["ventW","Window width front-back ✓ measured",4,14,0.1,"mm"],["ribW","Rib width ✓ measured",2,8,0.1,"mm"],["stemD","Stem depth (≤ window − 0.4)",4,13.6,0.1,"mm"],["barZ","Bar shift toward face",-4,2,0.5,"mm"],
+  ["lensGap","Window centre to inner lens (≈ railD/2)",4,25,0.5,"mm"],["tilt","Pod screen tilt down",0,40,1,"°"],["podGap","Pod gap under rail",0,6,0.5,"mm"],["podZ","Pod shift toward face",-5,1,0.5,"mm"],["hood","Light hood depth",0,5,0.5,"mm"],
+  ["foamD","Face foam thickness (bench clip)",4,22,0.5,"mm"],["benchTilt","Bench hinge angle (shown)",0,60,1,"°"],["cableD","Cable diameter",3,5,0.1,"mm"],["shield","Clear sheet thickness (0 = none)",0,1,0.05,"mm"],["ldr","Light-sensor hole (0/1)",0,1,1,""],["strapW","Strap width",30,50,0.5,"mm"],["strapT","Strap thickness",1.5,4,0.1,"mm"],["plugRoom","Battery plug room (pack)",5,11,0.5,"mm"]];
+const MODP=[["pcbW","PCB width (pin edge)"],["pcbH","PCB height"],["pcbT","PCB thickness"],["glassW","Glass width"],["glassH","Glass height"],["glassTop","Pin edge → glass"],["glassT","Glass + tape thickness"],["aaW","Active area width"],["aaH","Active area height"],["aaTop","Glass edge → active area"],["backT","Tallest part on back"],["pin1X","Left edge → pin 1 (VDD)"],["pinRow","Pin edge → pin row"],["headerH","Glass front → pin tips"]];
+const ESTIMATE={backT:1,pinRow:1};
+const cur=Object.assign({},OledCAD.DEFAULTS);
+document.getElementById("params").innerHTML=PARAMS.map(([k,n,a,b,s,u])=>`<label class="param"><span>${n}</span><input type="range" min="${a}" max="${b}" step="${s}" value="${cur[k]}" data-k="${k}" aria-label="${n}"><span><input type="number" min="${a}" max="${b}" step="${s}" value="${cur[k]}" data-n="${k}" aria-label="${n} value"> ${u}</span></label>`).join("");
+document.getElementById("modparams").innerHTML=MODP.map(([k,n])=>`<label class="mod" id="m_${k}"><span>${n} <span class="tag ${ESTIMATE[k]?"ds":"ds"}">${ESTIMATE[k]?"estimate":"drawing"} ${OledCAD.MODULE[k]}</span></span><input type="number" step="0.05" value="${cur[k]}" data-m="${k}" aria-label="${n}"><span style="color:var(--muted)">mm</span></label>`).join("");
+let rebuildT=null; const later=()=>{clearTimeout(rebuildT);rebuildT=setTimeout(rebuild,400);};
+document.querySelectorAll("#params input[type=range]").forEach(inp=>inp.oninput=()=>{const k=inp.dataset.k;cur[k]=+inp.value;document.querySelector(`[data-n="${k}"]`).value=inp.value;later();});
+document.querySelectorAll("#params input[type=number]").forEach(inp=>inp.onchange=()=>{const k=inp.dataset.n;if(!isFinite(+inp.value))return;cur[k]=+inp.value;document.querySelector(`[data-k="${k}"]`).value=inp.value;later();});
+document.querySelectorAll("#modparams input").forEach(inp=>inp.onchange=()=>{const k=inp.dataset.m,v=+inp.value;if(!(v>0))return;cur[k]=v;document.getElementById("m_"+k).classList.toggle("changed",v!==OledCAD.MODULE[k]);later();});
+
+function renderPanel(R){
+  let rows="",last=null,tot={bench:0,hud:0,pack:0},tmin={bench:0,hud:0,pack:0};
+  const order=["bench","hud","pack"];
+  for(const g of order) for(const k in R.parts){const p=R.parts[k];if(p.group!==g)continue;
+    if(g!==last){rows+=`<tr class="grp"><td colspan="5">${GROUP_NAME[g]}</td></tr>`;last=g;}
+    const gr=p.volume/1000*DENS[p.material]; tot[g]+=gr; tmin[g]+=p.minutes;
+    rows+=`<tr><td><span class="tag ${p.material.toLowerCase()}">${p.material}</span>${p.label}<small>${p.print}</small></td><td>${p.layer} mm<small>${p.infill} · walls 3 · supports: none</small></td><td class="n">${p.minutes}</td><td class="n">${gr.toFixed(1)}</td><td class="n"><button class="dl" data-stl="${k}" aria-label="Download ${p.label} STL">STL</button></td></tr>`;}
+  rows+=`<tr><td colspan="5" style="color:var(--muted)">Bench set ≈ ${tmin.bench} min (${tot.bench.toFixed(1)} g) · goggle end ≈ ${tmin.hud} min (${tot.hud.toFixed(1)} g) · pack ≈ ${tmin.pack} min (${tot.pack.toFixed(0)} g)</td></tr>`;
+  document.querySelector("#parts tbody").innerHTML=rows;
+  document.querySelectorAll("[data-stl]").forEach(b=>b.onclick=()=>downloadParts([b.dataset.stl],b));
+  const coll=R.collisions, h=R.hud.checks, bc=R.bench.checks;
+  const items=[
+    [coll.length===0,"No collisions",coll.length===0?"every printed part and component checked against every other one (goggle end incl. the frame rail, bench fixture, pack)":coll.map(c=>`${c.a} ↔ ${c.b}: ${c.v} mm³`).join("<br>")],
+    [true,"Intended press fits",R.presses.map(p=>`${p.a} ↔ ${p.b}: ${p.why}`).join("<br>")+`<br>bench clip ↔ frame rail: jaw gap = railT ${R.P.railT} mm, 0.5 mm grip bump`],
+    [h.lensClear>=1,"Pod clears the lens",`pod + hood reach ${h.reach} mm in front of the vent centre; lens at ${R.P.lensGap} mm → ${h.lensClear} mm left${h.lensClear<1?" (lower the tilt or the hood, or check lensGap)":""}`],
+    [bc.lensClear>=1,"Bench cradle clears the lens",`reaches ${bc.reach} mm forward → ${bc.lensClear} mm left; hangs ${bc.drop} mm below the rail top`],
+    [h.strain.pod<=3&&h.strain.stem<=3&&h.strain.bar<=3,"Snap strain (PETG ≤ 3 %)",`pod lid tabs ${h.strain.pod} % · stem arms ${h.strain.stem} % (${h.armL} mm long) · bar lid ${h.strain.bar} %`],
+    [h.barFront>=0,"Lens can snap back on",`bar front ${h.barFront} mm behind the rail front edge (lens seat)${h.barFront<0?": shift the bar toward the face (barZ)":""}; bench clip top jaw stops 1 mm short of it, its grip bump sits on the front lip`],
+    [R.P.ventL>=11.5,"Stem fits the vent window",`stem ${h.stemW} × ${h.stemD} mm (+0.6 mm catches) in the ${R.P.ventL} × ${R.P.ventW} mm window${h.locate?"; two locator blocks fill the window's length (0.25 mm clearance) so the pod can't slide sideways":""}; bearing pads ${h.padW} mm wide on the ${R.P.ribW} mm ribs`],
+    [true,"Window",`${h.window.join(" × ")} mm over the 21.74 × 10.86 active area, 45° chamfer`+(h.sheet?`; clear sheet ${R.P.shield} mm, cut ${h.sheet.join(" × ")} mm, sits in a pocket behind the window`:"")],
+    [true,"Light sensor",h.ldr?"Ø5.2 hole in the bar's front wall for a 5 mm LDR (GL5528), facing forward":"space for a 5 mm LDR kept free inside the bar; set the light-sensor hole to 1 to cut it"],
+    [true,"No screws, only USB-C reachable","snap fits, cable clamp, friction hinge pin (filament); pack as variant A"],
+  ];
+  document.getElementById("checks").innerHTML=items.map(([ok,t,d])=>`<div class="card ${ok?"ok":"bad"}" style="padding:7px 10px"><div class="check"><b class="${ok?"yes":"no"}">${ok?"✓":"✗"}</b><span><b>${t}</b><br><span style="color:var(--muted)">${d}</span></span></div></div>`).join("")+
+    `<p class="sub" style="margin-top:6px">Pod ${R.hud.dims.pod.map(v=>v.toFixed(1)).join(" × ")} mm (incl. hood) · bar ${R.hud.dims.bar.map(v=>v.toFixed(1)).join(" × ")} mm · pack ${R.pack.dims.L.toFixed(1)} × ${R.pack.dims.W.toFixed(1)} × ${R.pack.dims.T.toFixed(1)} mm</p>`;
+}
+
+// ---------- STL ----------
+let stlLib=null;
+async function downloadParts(names,btn){
+  const msg=document.getElementById("dlMsg"); if(btn) btn.disabled=true;
+  try{
+    if(!stlLib){msg.textContent="loading STL writer…";stlLib=await import(STL_URL);}
+    for(let i=0;i<names.length;i++){const n=names[i];msg.textContent=`writing ${i+1}/${names.length}: oled_${n}.stl`;
+      const data=stlLib.serialize({binary:true},OledCAD.printGeom(built.parts[n]));
+      const url=URL.createObjectURL(new Blob(data,{type:"model/stl"})),a=document.createElement("a");a.href=url;a.download=`oled_${n}.stl`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+      await new Promise(r=>setTimeout(r,300));}
+    msg.textContent=names.length>1?`${names.length} files saved (allow multiple downloads if the browser asks)`:"saved";
+  }catch(err){console.error(err);msg.textContent="STL export failed: "+err.message;}
+  if(btn) btn.disabled=false;
+}
+document.getElementById("dlAll").onclick=e=>downloadParts(Object.keys(built.parts),e.currentTarget);
+document.getElementById("dlBench").onclick=e=>downloadParts(Object.keys(built.parts).filter(k=>built.parts[k].group==="bench"),e.currentTarget);
+
+function rebuild(){
+  document.getElementById("busy").style.display="grid";
+  setTimeout(()=>{try{const t0=performance.now();built=OledCAD.build(cur);buildScene(built);renderPanel(built);console.log("CAD build",Math.round(performance.now()-t0),"ms","collisions",built.collisions.length,built.collisions);}catch(err){console.error(err);document.getElementById("checks").innerHTML=`<div class="card bad">Build failed: ${err.message}</div>`;}document.getElementById("busy").style.display="none";},30);
+}
+
+// ---------- loop ----------
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);labelRenderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(()=>{resize();if(!tween&&built){const e=fitPose(view);camera.position.copy(e.p);controls.target.copy(e.t);}}).observe(stage); resize();
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function frame(now){requestAnimationFrame(frame);
+  if(tween){const t=Math.min(1,(now-tween.t0)/700),k=ease(t);camera.position.lerpVectors(tween.s.p,tween.e.p,k);controls.target.lerpVectors(tween.s.t,tween.e.t,k);if(t>=1)tween=null;}
+  if(Math.abs(explodeK-explodeTarget)>0.002){explodeK+=(explodeTarget-explodeK)*0.15;applyExplode(explodeK);}
+  controls.update();renderer.render(scene,camera);labelRenderer.render(scene,camera);}
+rebuild();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

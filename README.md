@@ -16,4 +16,4 @@ https://mkuener.github.io/ski-hud/optics/ is a real-scale 3D model of the HUD op
 
 ## Harness and housings
 
-https://mkuener.github.io/ski-hud/harness/ is the wiring harness and https://mkuener.github.io/ski-hud/housing/ the 3D-printed housings. Sources: [harness/index.html](harness/index.html), [housing/index.html](housing/index.html) and [housing/cad.js](housing/cad.js).
+https://mkuener.github.io/ski-hud/harness/ is the wiring harness. The 3D-printed housings come in two versions, one per display being tested: https://mkuener.github.io/ski-hud/housing/ (variant A, 0.96" colour LCD) and https://mkuener.github.io/ski-hud/housing-oled/ (variant B, 0.96" OLED, with the bench test clip). Sources: [harness/index.html](harness/index.html), [housing/](housing/) and [housing-oled/](housing-oled/).
