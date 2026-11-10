@@ -14,6 +14,6 @@ The goggles show `--` for anything unknown, and blank everything if the page sto
 
 https://mkuener.github.io/ski-hud/optics/ is a real-scale 3D model of the HUD optics in the goggles: panel, f30 doublet, 45° mirror and film combiner, with live ray tracing, an eye view and a build sheet. Source: [optics/index.html](optics/index.html).
 
-## Private pages
+## Harness and housings
 
-https://mkuener.github.io/ski-hud/harness/ (wiring harness) and https://mkuener.github.io/ski-hud/housing/ (3D-printed housings) are password protected. The files in this repo are encrypted (AES-256-GCM, key from the password via PBKDF2-SHA256); the browser decrypts them after the password is entered. Their sources are not in this repo.
+https://mkuener.github.io/ski-hud/harness/ is the wiring harness and https://mkuener.github.io/ski-hud/housing/ the 3D-printed housings. Sources: [harness/index.html](harness/index.html), [housing/index.html](housing/index.html) and [housing/cad.js](housing/cad.js).
