@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ski HUD Housings</title>
+<title>Ski HUD Housings · Variant A LCD</title>
 <meta name="description" content="Parametric 3D-printed housings for the ski goggle HUD: strap pack and screen pod, with the full digital assembly, collision checks and print data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +54,10 @@ ul,ol{margin:6px 0;padding-left:18px} li{margin:3px 0}
 .param input{width:100%;accent-color:var(--accent)}
 .param output{text-align:right;color:var(--fg)}
 .check{display:flex;gap:8px;align-items:baseline;margin:4px 0}
-.check b{font:600 12px var(--mono)} .yes{color:var(--ok)} .no{color:var(--warn)}
+.check b{font:600 12px var(--mono)} .yes{color:var(--ok)} .no{color:var(--warn)} .note{color:var(--cyan)}
+.dl{font:500 12px var(--mono);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:4px;padding:3px 8px;cursor:pointer}
+.dl:hover{border-color:var(--accent)} .dl:focus-visible{outline:2px solid var(--accent);outline-offset:1px} .dl:disabled{opacity:.5;cursor:wait}
+td small{display:block;font:400 11px var(--ui);color:var(--muted)}
 @media (max-width:900px){
   .app{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto}
   .stage{height:60vh}
@@ -85,7 +88,8 @@ ul,ol{margin:6px 0;padding-left:18px} li{margin:3px 0}
   </div>
   <aside>
     <h1>Ski HUD housings</h1>
-    <p class="sub">3D-printed strap pack and screen pod, REKKIE-style. Snap fits, no screws; the only opening is the USB-C port. Parametric: change a measurement and every part rebuilds.</p>
+    <p style="margin:0 0 6px"><span class="tag cart">Variant A: 0.96in 160x80 ST7735S colour LCD</span></p>
+    <p class="sub">3D-printed strap pack and screen pod, REKKIE-style. Snap fits, no screws; the only opening is the USB-C port. Parametric: change a measurement and every part rebuilds. Every part downloads as an STL, already turned to its print orientation.</p>
 
     <div class="card info" id="info"><h3>Click a part</h3><p>Every printed part and component explains what it does and how it fits.</p></div>
 
@@ -97,41 +101,59 @@ ul,ol{margin:6px 0;padding-left:18px} li{margin:3px 0}
     <div id="params"></div>
 
     <h2>Printed parts</h2>
-    <table id="parts"><thead><tr><th>Part</th><th>Size mm</th><th class="n">g</th></tr></thead><tbody></tbody></table>
+    <table id="parts"><thead><tr><th>Part · print orientation</th><th>Size mm</th><th class="n">g</th><th class="n">STL</th></tr></thead><tbody></tbody></table>
     <p class="sub" style="margin-top:6px" id="mass"></p>
+    <p style="margin:6px 0"><button class="dl" id="dlAll">Download all STL files</button> <span class="sub" id="dlMsg"></span></p>
 
     <h2>Design</h2>
     <div class="card">
       <h3>Strap pack</h3>
       <ul>
-        <li><b>Stack:</b> battery on the head side, ESP32 Lite on top on foam tape, low-profile button under the lid. The 8-pin connector pair and the coil splices sit in a channel beside the board, where the battery leaves room down to the floor.</li>
-        <li><b>Battery leads soldered</b> to the board's battery socket pins: no plug sticking out, and the socket-type question goes away.</li>
-        <li><b>Lid snaps</b> onto the base: a lip slides inside the base walls, four bumps click into windows. Three posts in the lid hold the board down.</li>
-        <li><b>USB-C</b> is the only opening: a notch in the lid wall with a funnel so plug bodies seat fully. Silicone plug for snow.</li>
-        <li><b>Coil</b> leaves through a strain-relief cone at the front; inside, a cradle holds it (add a drop of glue).</li>
-        <li><b>Strap clamp:</b> the plate snaps under the base with four hooks and squeezes the strap in a ribbed channel. No threading, no screws.</li>
-        <li><b>Button:</b> a TPU cap (soft touch, seals the hole) presses a 12×12×4.3 switch held in a pocket in the lid.</li>
+        <li><b>Shape:</b> R3.5 corners, R2 edges on the head side, R3 on the outer face. The inside follows the outside, so every wall is 1.6 mm (top 1.8). A 0.4 mm shadow line at the seam hides any step between lid and base.</li>
+        <li><b>Stack:</b> battery on the head side in a rib cradle (0.3 mm room for the pouch to swell), ESP32 Lite on foam tape above it, button under the lid. The 8-pin connector pair and the coil splices sit in a channel beside the battery.</li>
+        <li><b>Battery plugs into the board's own socket.</b> The socket sits beside USB-C, so the pack is <i>plug room</i> longer at that end; the wires get a notch in the lid's lip.</li>
+        <li><b>Lid:</b> a 3.5 mm lip runs all the way round inside the base (a labyrinth: water has to climb up and over it). Four tabs click into blind pockets, so the wall has no holes. The bumps have a 45° back face: firm, but a flat screwdriver in the pry slot at either end opens it without breaking anything.</li>
+        <li><b>Button:</b> TPU cap with a thumb dish. Its flange sits in a recess under the lid and the switch spring presses it up against the lid, which seals the hole. The switch snaps into a pocket with two fingers, so pressing hard can't push it in.</li>
+        <li><b>USB-C</b> is the only opening: a 13.2 × 7.0 mm tunnel with a chamfered mouth. The TPU plug seals it with two ribs and hangs on a tether so it can't get lost.</li>
+        <li><b>Coil:</b> a TPU boot sits in the front wall (flange inside, shoulder in a countersink) and tapers over 12 mm, so the cable bends gradually instead of kinking at the wall.</li>
+        <li><b>Water:</b> splash- and snow-proof, not waterproof. Three 1.5 mm weep holes in the wall that faces down when worn let meltwater and condensation out and let the air pressure even out.</li>
+        <li><b>Strap clamp:</b> the plate snaps under the base with four hooks and squeezes the strap in a ribbed channel. It touches your head, so all its edges are fully rounded.</li>
       </ul>
     </div>
     <div class="card">
       <h3>Screen pod + frame bar</h3>
       <ul>
-        <li><b>Pod</b> hangs inside the goggle at the top centre, screen facing the lens, tilted down (set the tilt above). Front holds the screen behind a chamfered window; the back snaps in with two bumps and presses the screen with four ribs.</li>
-        <li><b>Stem</b> on the pod back goes up through the frame's top vent and clicks into the <b>frame bar</b> on top of the frame. Pod and bar clamp the frame rail between them: no glue, no screws.</li>
-        <li><b>Bar</b> holds the IMU rigidly on the frame and takes the coil through a strain-relief cone. Six wires go down the stem's channel to the screen; SDA/SCL and power branch to the IMU inside the bar.</li>
-        <li><b>No vent at the top centre?</b> Make a 16×5 mm slot, or glue the pod instead.</li>
+        <li><b>Goggle (COPOZZ, magnetic lens):</b> the top rail is a ladder of vent windows with 4 mm ribs; a 26.13 × 10.19 mm window sits at the top centre (measured). The HUD clamps the two ribs at that window's ends; the magnetic lens sits on the frame's front face and stays free to come off and snap back on.</li>
+        <li><b>Window clamp:</b> two legs on the pod: each has a pad that pushes up under one of the centre window's end ribs and a spring arm that rises through the window just inside that rib. The bar's floor sits on top of the same ribs and the catches hook outward over it, so both ribs are clamped top and bottom and the arms locate on the window's ends; knocks go into the frame, not the snaps. The arms flex inward, into the open window, and the wires run up between them.</li>
+        <li><b>Pod</b> hangs inside the goggle between lens and face foam, screen facing the lens, tilted down; the lens's dark glossy inner face is the mirror. The window covers the glass edge by 1 mm and has a 45° bezel. A hood (brow + side cheeks, <i>hood</i> slider) keeps light from the vents and the sides off the screen. Fit checks warn if it gets too close to the lens, your face or your line of sight, and suggest a tilt from your eye height.</li>
+        <li><b>Bar</b> sits on the rail centred over the window, set back so its front (even at its ends, where the frame curves back) stays behind the lens seat. It is 32 mm long, with the IMU centred on four 1.8 mm pads so it clears the catches, clamped by four posts in the lid. Wires go down to the pod through a hole in the middle of the floor. The coil's TPU boot lies in a U-notch and the lid closes it. Same snaps, shadow line and pry slot as the pack.</li>
+        <li><b>Vent foam:</b> if foam covers the centre window from below, cut two small slits in it for the arms (and one for the wires) next to the window's ends.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Making it</h3>
+      <ul>
+        <li><b>Materials:</b> PETG for every hard part (black or dark grey; the pod must be opaque). TPU 95A for the button cap, port plug and the two coil boots.</li>
+        <li><b>Printer:</b> 0.4 mm nozzle, 0.2 mm layers, 4 walls for PETG, 100 % infill for the TPU parts. The orientation is in the parts table and the STL files already lie that way. Nothing needs supports; give the pod back and the boots a brim.</li>
+        <li><b>Clearances:</b> 0.15 mm per side on sliding fits (lids, lips), 0.3 mm around the battery and the port plug body, 0–0.05 mm where TPU meets PETG (TPU squeezes). Snap bumps reach 0.25–0.35 mm into the other part.</li>
+        <li><b>Snap strain</b> stays at about 2.5 % or less (2.8 % in the worst slider case; PETG gives way at about 4 %), so every snap survives being opened again.</li>
+        <li><b>Smallest features:</b> 0.8 mm (switch fingers), text strokes 0.5–0.6 mm, 0.3–0.4 mm deep. Every face that sits on the bed starts on a round, so a squashed first layer doesn't change any fit.</li>
+        <li><b>Test first:</b> print the bar lid and base (5 g) to check your printer's fit before the big pack parts.</li>
+        <li><b>Ready-made files:</b> <code>site-src/housing/stl/</code> holds all 11 STLs at the current defaults (closed meshes, print orientation), with a README. Safe to print now: pack base, pack lid, button cap, port plug, both boots, bar base, bar lid (window and ribs are measured; rail thickness only moves the bar). Wait: strap plate (strap width/thickness), pod back (rail thickness, tilt, pod gap), and the pod front until the lens, face and view checks pass with your lens-to-foam depth and eye height. Set the sliders and use the STL buttons above, or re-export with <code>node site-src/housing/export-stl.mjs</code>.</li>
       </ul>
     </div>
 
     <h2>Assembly order</h2>
     <ol>
-      <li>Thread the coil through the pack's front cone, then splice it to the 8-pin male pigtail (heat-shrink).</li>
-      <li>Solder the female pigtail, button wires (GPIO27, G), battery leads (to the battery socket's pins; cut and solder one wire at a time) and the 100 kΩ/100 kΩ divider (battery + → GPIO35 → G, lying flat on top of the board near the left pin row) to the ESP32 Lite.</li>
-      <li>Pack base: battery on foam tape, Kapton over it, board on 2 mm foam tape, connector pair and splices into the channel, coil into the cradle with glue.</li>
-      <li>Switch into the lid pocket (trim its legs to 1.5 mm), TPU cap in from outside; snap the lid on.</li>
-      <li>Goggle end: thread the coil's other end through the bar's cone; solder 6 wires through the stem to the screen; bridge CS→GND and RES→VCC on the screen; IMU to SDA/SCL + power.</li>
-      <li>Screen into the pod front, pod back clicks on. From inside the goggle push the stem up through the vent into the bar until it clicks; IMU into the bar, lid on.</li>
+      <li>Slide the pack's TPU boot onto the coil, narrow end toward the goggle. Push the coil through the pack's front hole from outside, then press the boot in, flange first, until the flange pops behind the wall. Splice the coil to the 8-pin male pigtail (heat-shrink).</li>
+      <li>Solder the female pigtail, button wires (GPIO27, G), the matching plug on the battery leads (check polarity against the board's "+" with a multimeter before plugging in) and the 100 kΩ/100 kΩ divider (battery + → GPIO35 → G, lying flat on top of the board near the left pin row) to the ESP32 Lite.</li>
+      <li>Pack base: battery into the rib cradle on foam tape, Kapton over it, board on 2 mm foam tape, connector pair and splices into the channel, coil into the cradle with a drop of glue.</li>
+      <li>Lid, upside down: TPU cap into the hole from inside, then press the switch into its pocket until both fingers click (legs trimmed to 1.5 mm). Snap the lid on: four clicks.</li>
+      <li>Port plug: push the tether's mushroom pin into the small hole under the USB-C tunnel (flat pliers help), then press the plug into the tunnel.</li>
+      <li>Goggle end: thread the coil's other end through the bar's boot and lay the boot in the bar's U-notch; solder 6 wires down through the bar's centre wire hole and the centre window to the screen; bridge CS→GND and RES→VCC on the screen; IMU to SDA/SCL + power.</li>
+      <li>Screen into the pod front, pod back clicks on. Lens off. Set the bar on the rail centred over the middle window. From inside the goggle push the pod's two arms up through that window, just inside its end ribs, and through the bar's floor until both catches click. Feed the wires up between the arms through the bar's centre hole; a dab of silicone on the hole and round the arm slots keeps the goggle's damp air away from the IMU. IMU onto its pads, lid on, lens back on.</li>
       <li>Strap plate: lay the strap in the channel, snap the plate under the pack.</li>
+      <li><b>To open:</b> pack and bar lids lift with a small flat screwdriver in the pry slot at the seam. The pod comes off when you lift the IMU off its pads (bar lid off), pinch the two catch tips together with tweezers and pull the pod down. The pod front releases by pressing its two bumps through the side windows with a pin.</li>
     </ol>
 
     <h2>Added to the shopping list</h2>
@@ -143,29 +165,34 @@ ul,ol{margin:6px 0;padding-left:18px} li{margin:3px 0}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@jscad/modeling@2.12.5/dist/jscad-modeling.min.js"></script>
-<script src="cad.js"></script>
+<script src="cad.js?v=20261110b"></script>
 <script>
 "use strict";
 const DENS={PETG:1.27,TPU:1.21};
-const COMP_MASS={battery:38,pcb:5,screen:3,imu:2,coil:16,connector:1.5,switch:1,foam:1};
+const COMP_MASS={battery:39,pcb:5,screen:3,imu:2,coil:16,connector:1.5,switch:1,foam:1};
 const INFO={
-  pack_base:"Holds the battery and, via the foam tape, the board. Front wall has the coil's strain-relief cone and an inside cradle. Two windows per long side take the lid's snap bumps; grooves near the bottom take the strap-plate hooks.",
-  pack_lid:"Top plate with the button hole, a recess for the TPU cap's flange and a pocket for the switch. A 3.5 mm lip slides inside the base and clicks in with four bumps. Three posts press the board down. The rear wall has the USB-C notch with a funnel.",
-  pack_plate:"Snaps under the base with four hooks and clamps the goggle strap in a ribbed channel. Remove it to move the pack along the strap.",
-  button_cap:"Printed in TPU (95A): soft to press with gloves and it seals the button hole. Flange sits under the lid; the nub rests on the switch plunger.",
-  bar_base:"Sits on top of the goggle frame over the vent. Holds the IMU on four pads and takes the coil through a cone. The floor slot catches the pod's stem.",
-  bar_lid:"Snaps onto the bar base with four bumps; notched for the cable.",
-  pod_front:"Holds the 0.96″ screen behind a chamfered window, facing the lens. Two windows take the back's snap bumps.",
-  pod_back:"Back cover with four press ribs, plus the stem: up through the vent, two snap arms click into the bar floor, wire channel down the middle.",
-  "c:battery":"103450 LiPo, 2000 mAh, 10 × 34 × 50 mm.","c:pcb":"ESP32 Lite, 25.4 × 51 mm, on 2 mm foam tape.","c:usb":"USB-C: the only reachable port.","c:jst":"Board's battery socket: leads soldered to its pins instead of plugging in.","c:connector":"8-pin JST 1.25 pair: the internal service disconnect, not reachable from outside.","c:splices":"Pigtail ↔ coil splices under heat-shrink.","c:coil":"8-core coiled cable tail.","c:switch":"12×12×4.3 mm low-profile tactile switch.","c:screen":"0.96″ IPS ST7735S module.","c:imu":"ICM-20948 IMU board.","c:cable":"Coil tail into the bar.","c:foam":"2 mm double-sided foam tape over Kapton tape on the battery.","c:chip":"ESP32 chip.","c:ch340":"USB-serial chip."
+  pack_base:"Lower half. The battery sits in a rib cradle with 0.3 mm room to swell; the board rests on it on foam tape. Blind pockets with a 45° roof take the lid's snap bumps, so the wall has no holes. Front: coil-boot hole with a countersink and a glue cradle inside. Rear: a closed cup anchors the port plug's tether. Three 1.5 mm weep holes in the downward wall drain meltwater. Pry slots at both ends of the seam.",
+  pack_lid:"Top half. A 3.5 mm lip runs all round inside the base (labyrinth against water) with four flexing snap tabs. Three posts hold the board down. The switch snaps into a pocket with two fingers; the TPU cap floats in a recess above it. The USB-C tunnel has a chamfered mouth and side walls hanging from the top. Debossed name and an arrow pointing to the goggle.",
+  pack_plate:"Snaps under the base with four hooks and clamps the goggle strap in a ribbed channel. This face touches your head, so every edge is fully rounded. Lever a hook tip out with a fingernail to move the pack along the strap.",
+  port_plug:"TPU 95A. Closes the USB-C tunnel with two sealing ribs; the flange covers the chamfered mouth. A tether to a push-in anchor below the tunnel keeps it from getting lost. Lift it by the top edge of the flange to charge.",
+  button_cap:"TPU 95A. Soft and easy to find with gloves (thumb dish). The flange sits in a recess under the lid and the switch spring presses it up against the lid, so the hole stays sealed.",
+  pack_boot:"TPU 95A strain relief for the coil. Flange inside the wall, neck through it, shoulder in a countersink (seals the hole), then a 12 mm ribbed taper so the cable bends gradually instead of kinking at the wall. Pushed in from outside, flange first; glue in the inside cradle takes the pull.",
+  bar_base:"Sits on the goggle's top rail centred over the middle vent window, set back behind the lens seat. Its floor rests on the window's two end ribs and has two slots for the pod's arms plus a wire hole in the middle. Holds the IMU on four pads above the catches and the coil boot in a U-notch. Blind snap pockets; pry slot at the left end.",
+  bar_lid:"Snaps on with four tabs into blind pockets. Four posts clamp the IMU and the lid closes the boot's U-notch from above. Debossed name and an arrow pointing to the lens.",
+  bar_boot:"Same TPU boot as the pack's, with the flange trimmed flat to fit the 6.2 mm bar. It lies in the base's U-notch and the lid clamps it.",
+  pod_front:"Holds the 0.96″ screen behind a 1 mm border with a 45° bezel. The hood (brow + cheeks, depth set by the slider) keeps light from the vents and the sides off the screen and cuts stray light onto the lens edges. To open, press the back's bumps through the side windows with a pin.",
+  pod_back:"Back cover with four press ribs, plus the window clamp: two pads that push up under the ribs at the ends of the centre window and two spring arms that rise through the window and hook outward over the bar's floor. Release: bar lid off, IMU lifted, pinch the catch tips apart, pull the pod down.",
+  "c:battery":"103450 LiPo, 2000 mAh, 10 × 34 × 50 mm.","c:pcb":"ESP32 Lite, 25.4 × 51 mm, on 2 mm foam tape.","c:usb":"USB-C: the only reachable port.","c:jst":"Board's battery socket (2-pin, side entry; type found with the test plugs).","c:batplug":"Battery plug, matching the board's socket.","c:batwires":"Battery wires, bent down to the battery's leads.","c:connector":"8-pin JST 1.25 pair: the internal service disconnect, not reachable from outside.","c:splices":"Pigtail ↔ coil splices under heat-shrink.","c:coil":"8-core coiled cable tail, through the TPU boot.","c:switch":"12×12×4.3 mm low-profile tactile switch, snapped into the lid pocket.","c:screen":"0.96″ IPS ST7735S module.","c:imu":"ICM-20948 IMU board.","c:cable":"Coil tail into the bar, through the TPU boot.","c:foam":"2 mm double-sided foam tape over Kapton tape on the battery.","c:chip":"ESP32 chip.","c:ch340":"USB-serial chip."
 };
 const SHOP=[
+  ["2-pin test plugs: SH 1.0, JST 1.25, ZH 1.5, PH 2.0, XH 2.54 (10 each)","cart","find the board's battery socket type; the matching plug then goes on the battery"],
   ["12×12×4.3 mm tactile switches (low profile), 50 pcs","cart","fits under the lid; replaced the 12×12 button modules"],
   ["100 kΩ resistors, 1/4 W, 100 pcs (battery divider)","cart","replaced the MAX17048 gauge: smaller, nothing extra in the pack"],
   ["Kapton tape, 30 mm","cart","insulates the battery from the board's solder joints"],
   ["2 mm double-sided foam tape, 20 mm","cart","mounts the board on the battery without screws"],
-  ["TPU filament (95A), or a print service","add","only for the 0.5 g button cap; not in the cart"],
-  ["PETG filament","add","all other parts, about 37 g; not in the cart"],
+  ["TPU filament (95A), or a print service","add","button cap, port plug and two coil boots, about 2 g; not in the cart"],
+  ["PETG filament, black","add","all other parts, about 40 g; the pod must be opaque; not in the cart"],
+  ["Clear silicone sealant (small tube)","add","glues the coil in the pack's cradle and seals the arm slots and wire hole in the bar; not in the cart"],
 ];
 
 // ---------- three.js ----------
@@ -182,7 +209,7 @@ const clip=new THREE.Plane(new THREE.Vector3(0,0,-1),0); let sectionOn=false;
 const mk=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.05,side:THREE.DoubleSide},o));
 const MAT={PETG:mk(0x2a2f36,{roughness:.6}),TPU:mk(0x3b6fd1,{roughness:.8}),battery:mk(0xb9bdc2,{metalness:.5,roughness:.35}),pcb:mk(0x111519),pcbBlue:mk(0x1c3f8c),pcbIMU:mk(0x141a2c),
   steel:mk(0xc9ced3,{metalness:.9,roughness:.25}),cream:mk(0xeee3c8,{roughness:.8}),chip:mk(0x1d1f22),shrink:mk(0x3a3a3a,{roughness:.9}),cable:mk(0x151515),foam:mk(0xd8b24a,{roughness:.9}),rail:mk(0x3a3f45,{transparent:true,opacity:.55})};
-const PART_COL={pack_base:0x2b3038,pack_lid:0x343a44,pack_plate:0x23272d,button_cap:0x3b6fd1,bar_base:0x2b3038,bar_lid:0x343a44,pod_front:0x2f353e,pod_back:0x262a31};
+const PART_COL={pack_base:0x2b3038,pack_lid:0x343a44,pack_plate:0x23272d,button_cap:0x3b6fd1,port_plug:0x3b6fd1,pack_boot:0x2d4f86,bar_base:0x2b3038,bar_lid:0x343a44,bar_boot:0x2d4f86,pod_front:0x2f353e,pod_back:0x262a31};
 
 function toThree(geom){
   const pos=[]; for(const p of SkiCAD.toPolygons(geom)){const v=p.vertices;for(let i=1;i<v.length-1;i++){pos.push(...v[0],...v[i],...v[i+1]);}}
@@ -303,7 +330,7 @@ function showInfo(n){
 }
 
 // ---------- panel ----------
-const PARAMS=[["strapW","Strap width",30,50,0.5,"mm"],["strapT","Strap thickness",1.5,4,0.1,"mm"],["railT","Frame rail thickness at vent",3,10,0.1,"mm"],["ventL","Vent slot length",15,26,0.5,"mm"],["ventW","Vent slot width",4,8,0.1,"mm"],["tilt","Screen tilt down",0,35,1,"°"],["podGap","Pod gap under rail",0,6,0.5,"mm"]];
+const PARAMS=[["strapW","Strap width",30,50,0.5,"mm"],["strapT","Strap thickness",1.5,4,0.1,"mm"],["railT","Rail thickness at the window ribs",3,10,0.1,"mm"],["ribW","Rib width (measured 4)",2,8,0.1,"mm"],["winL","Centre window length (measured 26.13)",9,32,0.01,"mm"],["winH","Centre window height, front–back (measured 10.19)",3,14,0.01,"mm"],["cavityD","Lens to face foam, top centre",12,30,0.5,"mm"],["eyeH","Eye height below the rail",20,50,0.5,"mm"],["tilt","Screen tilt down",0,35,1,"°"],["podGap","Pod gap under rail",0,6,0.5,"mm"],["plugRoom","Battery plug room",5,11,0.5,"mm"],["hood","Screen hood depth",0,3,0.5,"mm"]];
 const cur=Object.assign({},SkiCAD.DEFAULTS);
 document.getElementById("params").innerHTML=PARAMS.map(([k,n,a,b,s,u])=>`<label class="param"><span>${n}</span><input type="range" min="${a}" max="${b}" step="${s}" value="${cur[k]}" data-k="${k}"><output id="o_${k}">${cur[k]} ${u}</output></label>`).join("");
 let rebuildT=null;
@@ -311,21 +338,54 @@ document.querySelectorAll("#params input").forEach(inp=>inp.oninput=()=>{const k
 document.getElementById("shop").innerHTML=SHOP.map(([n,t,w])=>`<div class="card" style="padding:7px 10px"><span class="tag ${t}">${t==="add"?"to add":"in cart"}</span> <b>${n}</b><br><span style="color:var(--muted)">${w}</span></div>`).join("");
 
 function renderPanel(R){
-  let total=0;
-  document.querySelector("#parts tbody").innerHTML=Object.keys(R.parts).map(k=>{const p=R.parts[k],g=p.volume/1000*DENS[p.material];total+=g;return `<tr><td><span class="tag ${p.material.toLowerCase()}">${p.material}</span>${p.label}</td><td>${p.size.join("×")}</td><td class="n">${g.toFixed(1)}</td></tr>`;}).join("");
+  let total=0, tpu=0;
+  document.querySelector("#parts tbody").innerHTML=Object.keys(R.parts).map(k=>{const p=R.parts[k],g=p.volume/1000*DENS[p.material];total+=g;if(p.material==="TPU")tpu+=g;return `<tr><td><span class="tag ${p.material.toLowerCase()}">${p.material}</span>${p.label}<small>${p.print}</small></td><td>${p.size.join("×")}</td><td class="n">${g.toFixed(1)}</td><td class="n"><button class="dl" data-stl="${k}" aria-label="Download ${p.label} STL">STL</button></td></tr>`;}).join("");
+  document.querySelectorAll("[data-stl]").forEach(b=>b.onclick=()=>downloadStl([b.dataset.stl]));
   const comp=Object.values(COMP_MASS).reduce((a,b)=>a+b,0);
-  document.getElementById("mass").textContent=`Printed parts ${total.toFixed(0)} g + electronics ≈ ${comp} g → about ${(total+comp).toFixed(0)} g on the goggles (REKKIE: 253 g including the goggles).`;
-  const coll=R.collisions;
+  document.getElementById("mass").textContent=`Printed parts ${total.toFixed(0)} g (PETG ${(total-tpu).toFixed(0)} g, TPU ${tpu.toFixed(1)} g) + electronics ≈ ${comp} g → about ${(total+comp).toFixed(0)} g on the goggles (REKKIE: 253 g including the goggles).`;
+  const coll=R.collisions, pc=R.pack.checks, hc=R.hud.checks, st=Object.assign({},pc.strain,hc.strain), maxSt=Math.max(...Object.values(st));
   const items=[
     [coll.length===0,"No collisions",coll.length===0?"every part and component checked against every other one":coll.map(c=>`${c.a} ↔ ${c.b}: ${c.v} mm³`).join("<br>")],
-    [true,"No screws","lid, plate, pod and bar are all snap fits; board and battery on foam tape"],
-    [true,"Only USB-C reachable","8-pin connector pair inside the pack; battery soldered; nothing else opens"],
-    [R.pack.checks.usbRecess<=1.2,"USB-C depth",`receptacle face ${R.pack.checks.usbRecess} mm inside the outer wall, funnel around it`],
-    [true,"Button reach","TPU nub rests on the plunger (0 mm gap, no preload)"],
+    [true,"No screws","lids, plate, switch, pod and bar all snap; board and battery on foam tape; boots and the bar's arm slots and wire hole get a drop of silicone"],
+    [true,"Only USB-C reachable","8-pin connector pair and battery plug inside the pack; the weep holes are 1.5 mm and face down"],
+    [true,"USB-C tunnel",`receptacle ${pc.usbRecess} mm inside the outer wall; tunnel ${pc.tunnel.join(" × ")} mm with a chamfered mouth takes the cable's plug body (most cables fit)`],
+    [pc.plugClear>=1.5,"Battery plug room",pc.plugClear>=1.5?`${pc.plugClear} mm free behind a PH 2.0 plug for its bent wires; the lid's lip is notched where they pass`:`only ${pc.plugClear} mm behind a PH 2.0 plug: too tight for its wires, raise plug room to 6 mm or more`],
+    [maxSt<=3.5,"Snap fits",`bending strain: pack lid ${st.lid} %, bar lid ${st.bar} %, pod ${st.pod} %, window-clamp arms ${st.stem} % (${hc.armL} mm long), strap hooks ${st.plate} %, switch fingers ${st.sw} %. PETG gives way at about 4 %.`],
+    [true,"Sealing","seam: 3.5 mm labyrinth lip all round; button: TPU flange held up by the switch spring; USB-C: TPU plug with two ribs; coil: TPU boots in countersinks. Splash- and snow-proof, not waterproof."],
+    [pc.weeps>=2,"Drainage",`${pc.weeps} weep holes Ø1.5 in the pack wall that faces down when worn; the bar's arm slots and wire hole get a dab of silicone against the goggle's damp air`],
+    [true,"Button","TPU flange rests on the plunger (0 mm gap); 0.4 mm of travel room in the recess; the switch can't be pushed out (snap fingers)"],
+    [R.P.winL>=hc.winNeedL&&R.P.winH>=hc.winNeedH,"Window clamp",`arms ${hc.armD} mm deep go up through the centre window just inside its ${R.P.ribW} mm end ribs; needs a window at least ${hc.winNeedL} mm long (arms + wire hole between them) and ${hc.winNeedH} mm high; yours: ${R.P.winL} × ${R.P.winH} mm`],
+    [hc.lensClear>=1&&hc.barFront<=hc.zL,"Lens stays free",`pod and hood stop ${hc.lensClear} mm behind the lens (need ≥ 1); the bar's front is ${(hc.zL-hc.barFront).toFixed(1)} mm behind the lens seat at its ends. Both use an assumed frame/lens curve (R 110 mm in plan) and rail depth, not measured.`],
+    [hc.podBack>=hc.zF+1,"Face clearance",`the pod's lowest back corner is ${(hc.podBack-hc.zF).toFixed(1)} mm in front of the face foam (need ≥ 1; tilting more swings it toward your face)`],
+    [hc.eyeClear>=5,"View",`the pod hangs ${(-hc.podBottom).toFixed(0)} mm below the rail, ${hc.eyeClear} mm above your eye line (want ≥ 5, or it sits in your view ahead); lower pod gap if short`],
+    [Math.abs(R.P.tilt-hc.tiltSuggest)<=4,"Screen tilt",`for your eye height and lens distance the reflection reaches the eye at about ${hc.tiltSuggest}° tilt (set: ${R.P.tilt}°). Estimate: flat lens, eye 12 mm behind the foam.`],
+    [true,"Printable","all 11 parts print without supports; orientation in the parts table"],
   ];
   document.getElementById("checks").innerHTML=items.map(([ok,t,d])=>`<div class="card ${ok?"ok":"bad"}" style="padding:7px 10px"><div class="check"><b class="${ok?"yes":"no"}">${ok?"✓":"✗"}</b><span><b>${t}</b><br><span style="color:var(--muted)">${d}</span></span></div></div>`).join("")+
-    `<p class="sub" style="margin-top:6px">Pack ${R.pack.dims.L.toFixed(1)} × ${R.pack.dims.W.toFixed(1)} × ${R.pack.dims.T.toFixed(1)} mm incl. strap plate · bar ${R.hud.dims.bar.map(v=>v.toFixed(1)).join(" × ")} · pod ${R.hud.dims.pod.map(v=>v.toFixed(1)).join(" × ")} mm</p>`;
+    `<p class="sub" style="margin-top:6px">Pack ${R.pack.dims.L.toFixed(1)} × ${R.pack.dims.W.toFixed(1)} × ${R.pack.dims.T.toFixed(1)} mm incl. strap plate (${R.pack.dims.Lboot.toFixed(0)} mm long with boot and plug) · bar ${R.hud.dims.bar.map(v=>v.toFixed(1)).join(" × ")} · pod ${R.hud.dims.pod.map(v=>v.toFixed(1)).join(" × ")} mm incl. hood</p>`;
 }
+
+// ---------- STL export (binary, each part turned to its print orientation) ----------
+let stlLib=null;
+const loadStl=()=>stlLib||(stlLib=import("https://cdn.jsdelivr.net/npm/@jscad/stl-serializer@2.1.20/+esm"));
+async function downloadStl(names){
+  const msg=document.getElementById("dlMsg"), all=document.getElementById("dlAll");
+  if(!built) return;
+  all.disabled=true; msg.textContent="Preparing…";
+  try{
+    const lib=await loadStl();
+    for(const n of names){
+      const data=lib.serialize({binary:true},SkiCAD.printGeom(built.parts[n]));
+      const url=URL.createObjectURL(new Blob(data,{type:"model/stl"}));
+      const a=document.createElement("a"); a.href=url; a.download=`A-lcd_${n}.stl`; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      if(names.length>1) await new Promise(r=>setTimeout(r,350));
+    }
+    msg.textContent=names.length>1?`${names.length} files saved (millimetres, Z up)`:"";
+  }catch(err){console.error(err); msg.textContent="STL export failed: "+err.message;}
+  all.disabled=false;
+}
+document.getElementById("dlAll").onclick=()=>built&&downloadStl(Object.keys(built.parts));
 
 function rebuild(){
   document.getElementById("busy").style.display="grid";
